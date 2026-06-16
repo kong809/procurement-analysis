@@ -74,44 +74,6 @@ def req_modal(df_data):
             pass
 
 
-@st.dialog("📌 功能引导", width="large")
-def guide_modal():
-    st.markdown("""
-    **整体操作逻辑：** 导入采销工作台导出的采购单明细表格，即可生成多维度数据分析内容。
-
-    ---
-
-    **📦 基础数据分析**
-
-    支持剔除单据维度，按SKU、供应商双维度，对指定周期内采购数量、实收数量、采购金额、采购单价等指标开展统计分析。
-
-    ---
-
-    **💰 采购金额数据分析**
-
-    围绕采购金额，提供SKU、供应商维度精细化分析视图；可查看单供应商下各SKU采购金额分布，针对一品多商业务场景，支持查看同一SKU在不同供应商侧的供货分布、采购单价及采购金额占比。
-
-    ---
-
-    **🧮 补货数据分析**
-
-    面向手动补货需求用户，通过补货模块测算所需补货量；支持一键点击「采购需求提报」完成补货操作，快速生成对应采购单，实现快捷补货。
-
-    ---
-
-    **✅ 采购履约数据分析**
-
-    从采购单履约率、履约时效两大维度进行数据查看；支持自定义调整履约周期，直观展示采购单正常时效、轻微逾期、严重逾期三类单据区间及对应占比。
-
-    ---
-
-    **⚠️ 采购预警数据分析**
-
-    系统针对同一SKU多供应商价差异常自动触发预警：同SKU采购价高出最低价8%-15%触发二级预警；高出最低价15%及以上触发一级预警。
-    """)
-    if st.button("我知道了", type="primary", use_container_width=True, key="guide_close"):
-        st.session_state["guide_dismissed"] = True
-        st.rerun()
 
 
 st.set_page_config(page_title="采购单智能分析", page_icon="📊", layout="wide")
@@ -233,6 +195,48 @@ section[data-testid="stSidebar"] button[kind="secondary"]:hover {
 
 /* ─ 上传区 ─ */
 [data-testid="stExpander"] [data-testid="stFileUploader"] { border: 2px dashed #d1d5db; border-radius: 8px; padding: 12px; }
+
+/* ─ 新手引导遮罩与提示 ─ */
+.guide-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.45); z-index: 9998;
+    transition: opacity 0.3s;
+}
+.guide-tooltip {
+    position: fixed; z-index: 9999;
+    background: #fff; border-radius: 12px; padding: 20px 24px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    max-width: 440px; min-width: 320px;
+    animation: guideSlideIn 0.35s ease-out;
+}
+@keyframes guideSlideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.guide-tooltip .guide-step-badge {
+    display: inline-block; background: #3b82f6; color: #fff;
+    font-size: 11px; font-weight: 700; border-radius: 10px;
+    padding: 2px 10px; margin-bottom: 8px;
+}
+.guide-tooltip .guide-title {
+    font-size: 15px; font-weight: 700; color: #111827; margin-bottom: 6px;
+}
+.guide-tooltip .guide-desc {
+    font-size: 13px; color: #4b5563; line-height: 1.6; margin-bottom: 14px;
+}
+.guide-tooltip .guide-footer {
+    display: flex; justify-content: space-between; align-items: center;
+}
+.guide-tooltip .guide-footer .guide-dots {
+    display: flex; gap: 6px;
+}
+.guide-tooltip .guide-footer .guide-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #d1d5db; transition: background 0.2s;
+}
+.guide-tooltip .guide-footer .guide-dot.active {
+    background: #3b82f6;
+}
 </style>""", unsafe_allow_html=True)
 
 st.markdown("## 📊 采购单智能分析")
@@ -281,13 +285,109 @@ with st.sidebar:
             )
     st.markdown("---")
     if st.button("📌 功能引导", use_container_width=True, key="nav_guide"):
-        st.session_state["guide_dismissed"] = False
+        st.session_state["guide_step"] = 0
+        st.rerun()
 
-# ── 首次进入引导 ──
-if "guide_dismissed" not in st.session_state:
-    st.session_state["guide_dismissed"] = False
-if not st.session_state["guide_dismissed"] and "merged_df" not in st.session_state:
-    guide_modal()
+# ── 新手引导（分步交互式） ──
+GUIDE_STEPS = [
+    {"icon": "📤", "title": "数据上传", "anchor": "", "desc": "导入采销工作台导出的采购单明细表格，即可生成多维度数据分析内容。支持 .xls / .xlsx 格式，可同时上传多个文件。"},
+    {"icon": "📦", "title": "基础数据分析", "anchor": "sec-basic", "desc": "支持剔除单据维度，按SKU、供应商双维度，对指定周期内采购数量、实收数量、采购金额、采购单价等指标开展统计分析。"},
+    {"icon": "💰", "title": "采购金额数据分析", "anchor": "sec-amount", "desc": "围绕采购金额，提供SKU、供应商维度精细化分析视图；可查看单供应商下各SKU采购金额分布，针对一品多商业务场景，支持查看同一SKU在不同供应商侧的供货分布、采购单价及采购金额占比。"},
+    {"icon": "🧮", "title": "补货数据分析", "anchor": "sec-replenish", "desc": "面向手动补货需求用户，通过补货模块测算所需补货量；支持一键点击「采购需求提报」完成补货操作，快速生成对应采购单，实现快捷补货。"},
+    {"icon": "✅", "title": "采购履约数据分析", "anchor": "sec-fulfillment", "desc": "从采购单履约率、履约时效两大维度进行数据查看；支持自定义调整履约周期，直观展示采购单正常时效、轻微逾期、严重逾期三类单据区间及对应占比。"},
+    {"icon": "⚠️", "title": "采购预警数据分析", "anchor": "sec-alert", "desc": "系统针对同一SKU多供应商价差异常自动触发预警：同SKU采购价高出最低价8%-15%触发二级预警；高出最低价15%及以上触发一级预警。"},
+]
+
+if "guide_step" not in st.session_state:
+    st.session_state["guide_step"] = -1  # -1 = not active
+
+# 首次进入且无数据时自动启动引导
+if "guide_ever_started" not in st.session_state and "merged_df" not in st.session_state:
+    st.session_state["guide_step"] = 0
+    st.session_state["guide_ever_started"] = True
+
+guide_step = st.session_state["guide_step"]
+if guide_step >= 0 and guide_step < len(GUIDE_STEPS):
+    step = GUIDE_STEPS[guide_step]
+    anchor = step["anchor"]
+    total = len(GUIDE_STEPS)
+
+    # 滚动到对应区段
+    if anchor:
+        components.html(
+            f"""<script>
+            function findAndScroll(doc) {{
+                var el = doc.getElementById('{anchor}');
+                if (!el) el = doc.querySelector('[name="{anchor}"]');
+                if (el) el.scrollIntoView({{behavior:'smooth', block:'start'}});
+                return !!el;
+            }}
+            if (!findAndScroll(document)) {{
+                var frames = document.querySelectorAll('iframe');
+                for (var i=0; i<frames.length; i++) {{
+                    try {{ if (findAndScroll(frames[i].contentDocument)) break; }} catch(e) {{}}
+                }}
+                var w = window;
+                while (w.parent && w.parent !== w) {{
+                    try {{ if (findAndScroll(w.parent.document)) break; }} catch(e) {{}}
+                    w = w.parent;
+                }}
+            }}
+            </script>""",
+            height=0,
+        )
+
+    # 渲染遮罩 + 提示气泡
+    dots_html = "".join(
+        f'<div class="guide-dot{" active" if i == guide_step else ""}"></div>'
+        for i in range(total)
+    )
+    is_last = guide_step == total - 1
+    next_label = "完成" if is_last else "下一步"
+    components.html(f"""
+    <div class="guide-overlay"></div>
+    <div class="guide-tooltip" style="top:50%;left:50%;transform:translate(-50%,-50%);">
+        <div class="guide-step-badge">步骤 {guide_step+1}/{total}</div>
+        <div class="guide-title">{step["icon"]} {step["title"]}</div>
+        <div class="guide-desc">{step["desc"]}</div>
+        <div class="guide-footer">
+            <div class="guide-dots">{dots_html}</div>
+            <div style="display:flex;gap:8px;">
+                <button id="guide-skip" style="background:#f3f4f6;border:1px solid #d1d5db;color:#6b7280;
+                    border-radius:6px;padding:6px 16px;font-size:13px;cursor:pointer;">跳过</button>
+                <button id="guide-next" style="background:#3b82f6;border:none;color:#fff;
+                    border-radius:6px;padding:6px 16px;font-size:13px;cursor:pointer;font-weight:600;">{next_label}</button>
+            </div>
+        </div>
+    </div>
+    <script>
+    var stepIdx = {guide_step};
+    var totalSteps = {total};
+    document.getElementById('guide-next').onclick = function() {{
+        if (stepIdx >= totalSteps - 1) {{
+            window.parent.postMessage({{type:'streamlit:setComponentValue',value:'done'}},'*');
+        }} else {{
+            window.parent.postMessage({{type:'streamlit:setComponentValue',value:String(stepIdx+1)}},'*');
+        }}
+    }};
+    document.getElementById('guide-skip').onclick = function() {{
+        window.parent.postMessage({{type:'streamlit:setComponentValue',value:'skip'}},'*');
+    }};
+    </script>
+    """, height=0)
+
+    # 通过隐藏的 text_input 接收 JS 回传
+    guide_action = st.text_input("__guide_action__", label_visibility="collapsed", key="_guide_action_input")
+    if guide_action:
+        if guide_action == "skip" or guide_action == "done":
+            st.session_state["guide_step"] = -1
+        else:
+            try:
+                st.session_state["guide_step"] = int(guide_action)
+            except ValueError:
+                st.session_state["guide_step"] = -1
+        st.session_state["_guide_action_input"] = ""
+        st.rerun()
 
 # ═══════════════════════════════════════════════════════════
 # 数据上传区 —— 始终可见，新上传覆盖旧数据
