@@ -155,6 +155,7 @@ def delivery_timeliness(df: pd.DataFrame, cycle_days: int = 10) -> pd.DataFrame:
     )
 
     result = valid.groupby("采购单号").agg(
+        供应商名称=("供应商名称", "first") if "供应商名称" in valid.columns else ("采购单号", "first"),
         采购单状态=("采购单状态", "first") if "采购单状态" in valid.columns else ("采购单号", "first"),
         预计到货时间=("预计到货时间", "first") if has_eta else ("采购时间", "first"),
         采购时间=("采购时间", "first"),

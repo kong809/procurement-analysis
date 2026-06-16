@@ -14,7 +14,19 @@ from analysis.supplier_analysis import supplier_overview, supplier_sku_detail, s
 from analysis.replenishment import calculate_replenishment
 from analysis.fulfillment import fulfillment_rate, delivery_timeliness
 from analysis.price_alert import sku_price_alert_list
-from config.settings import FULFILLMENT_FULL, FULFILLMENT_PARTIAL, FULFILLMENT_NONE
+from config.settings import FULFILLMENT_FULL, FULFILLMENT_PARTIAL, FULFILLMENT_NONE, DEFAULT_DELIVERY_CYCLE_DAYS
+
+
+def card(icon, title):
+    st.markdown(f'<div class="card"><div class="card-title"><span class="icon">{icon}</span>{title}</div>', unsafe_allow_html=True)
+
+
+def card_end():
+    st.markdown('</div>', unsafe_allow_html=True)
+
+
+def section_header(title):
+    st.markdown(f'<div class="section-header">{title}</div>', unsafe_allow_html=True)
 
 
 @st.dialog("采购需求提报", width="large")
@@ -60,27 +72,101 @@ def req_modal(df_data):
 
 st.set_page_config(page_title="采购单智能分析", page_icon="📊", layout="wide")
 
-# ── 全局样式：字体缩小、间距压缩 ──
+# ── 全局样式：白底卡片风 ──
 st.markdown("""<style>
-html, body, [class*="stMarkdown"] { font-size: 13px; }
-h1 { font-size: 1.3rem !important; margin-bottom: 0.3rem !important; }
-h3 { font-size: 0.95rem !important; margin-top: 0.3rem !important; margin-bottom: 0.2rem !important; }
-.stMetric { padding: 0.2rem 0 !important; }
+/* ─ 基础排版 ─ */
+html, body, [class*="stMarkdown"] { font-size: 13px; color: #1f2937; }
+.block-container {
+    padding-top: 1.5rem !important; padding-bottom: 1rem !important;
+    background: #fff;
+}
+
+/* ─ 标题层级 ─ */
+h1 { font-size: 1.4rem !important; font-weight: 700 !important; color: #111827 !important; margin-bottom: 0.4rem !important; }
+h3 { font-size: 0.95rem !important; font-weight: 600 !important; color: #374151 !important; margin-top: 0.3rem !important; margin-bottom: 0.2rem !important; }
+
+/* ─ 卡片容器 ─ */
+.card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    transition: box-shadow 0.15s;
+}
+.card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.09); }
+
+.card-title {
+    font-size: 0.88rem; font-weight: 600; color: #1f2937;
+    margin-bottom: 10px; padding-bottom: 6px;
+    border-bottom: 2px solid #e5e7eb;
+    display: flex; align-items: center; gap: 6px;
+}
+.card-title .icon { font-size: 1rem; }
+
+/* ─ 区段标题 ─ */
+.section-header {
+    font-size: 1.05rem; font-weight: 700; color: #1e40af;
+    padding: 6px 0; margin: 8px 0 4px 0;
+    border-left: 4px solid #3b82f6; padding-left: 10px;
+}
+
+/* ─ Metric 卡片 ─ */
+.stMetric {
+    background: #f9fafb; border-radius: 8px; padding: 8px 10px !important;
+    border: 1px solid #f3f4f6;
+}
 .stMetric > div { font-size: 12px !important; }
-.stMetric label { font-size: 11px !important; }
-.stMetric [data-testid="stMetricValue"] { font-size: 1.1rem !important; }
-.stDataFrame { font-size: 11px !important; }
+.stMetric label { font-size: 11px !important; color: #6b7280 !important; }
+.stMetric [data-testid="stMetricValue"] { font-size: 1.15rem !important; font-weight: 700 !important; color: #111827 !important; }
+
+/* ─ 数据表格 ─ */
+.stDataFrame { font-size: 11px !important; border-radius: 6px !important; overflow: hidden; }
+.stDataFrame table { border-collapse: collapse !important; }
+.stDataFrame th { background: #f9fafb !important; font-weight: 600 !important; color: #374151 !important; border-bottom: 2px solid #e5e7eb !important; }
+.stDataFrame td { border-bottom: 1px solid #f3f4f6 !important; }
+
+/* ─ 控件标签 ─ */
 .stMultiSelect label, .stSelectbox label, .stNumberInput label,
-.stDateInput label, .stRadio label { font-size: 11px !important; }
-.stExpander > summary { font-size: 13px !important; padding-top: 0.2rem !important; padding-bottom: 0.2rem !important; }
-.stAlert { padding: 0.3rem 0.5rem !important; font-size: 12px !important; }
-.stDownloadButton button { font-size: 11px !important; padding: 0.15rem 0.5rem !important; }
-.block-container { padding-top: 1.5rem !important; padding-bottom: 1rem !important; }
-hr { margin-top: 0.3rem !important; margin-bottom: 0.5rem !important; }
+.stDateInput label, .stRadio label { font-size: 11px !important; color: #6b7280 !important; font-weight: 500 !important; }
+
+/* ─ 折叠器 ─ */
+.stExpander { border: 1px solid #e5e7eb !important; border-radius: 8px !important; overflow: hidden; }
+.stExpander > summary { font-size: 13px !important; padding: 8px 12px !important; background: #f9fafb !important; }
+
+/* ─ 提示条 ─ */
+.stAlert { padding: 6px 10px !important; font-size: 12px !important; border-radius: 6px !important; }
+.stSuccess { background: #f0fdf4 !important; border: 1px solid #bbf7d0 !important; color: #166534 !important; }
+.stInfo { background: #eff6ff !important; border: 1px solid #bfdbfe !important; color: #1e40af !important; }
+.stWarning { background: #fffbeb !important; border: 1px solid #fde68a !important; color: #92400e !important; }
+
+/* ─ 下载按钮 ─ */
+.stDownloadButton button {
+    font-size: 11px !important; padding: 4px 12px !important;
+    border-radius: 6px !important; background: #f9fafb !important;
+    border: 1px solid #d1d5db !important; color: #374151 !important;
+    transition: all 0.15s;
+}
+.stDownloadButton button:hover { background: #eff6ff !important; border-color: #93c5fd !important; color: #1e40af !important; }
+
+/* ─ 分隔线 ─ */
+hr { margin-top: 4px !important; margin-bottom: 4px !important; border-color: #f3f4f6 !important; }
+
+/* ─ 隐藏侧边栏 ─ */
 section[data-testid="stSidebar"] { display: none !important; }
+
+/* ─ 筛选行 ─ */
+.filter-row {
+    background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px;
+    padding: 10px 14px; margin-bottom: 12px;
+}
+
+/* ─ 上传区 ─ */
+[data-testid="stExpander"] [data-testid="stFileUploader"] { border: 2px dashed #d1d5db; border-radius: 8px; padding: 12px; }
 </style>""", unsafe_allow_html=True)
 
-st.markdown("## 采购单智能分析")
+st.markdown("## 📊 采购单智能分析")
 
 # ═══════════════════════════════════════════════════════════
 # 数据上传区 —— 始终可见，新上传覆盖旧数据
@@ -129,14 +215,13 @@ if "merged_df" not in st.session_state or st.session_state["merged_df"].empty:
 df = st.session_state["merged_df"]
 st.caption(f"当前数据：{len(df):,} 行 × {len(df.columns)} 列")
 
-st.markdown("---")
-st.markdown("### 基础数据分析")
-st.markdown("---")
+section_header("基础数据分析")
 
 # ═══════════════════════════════════════════════════════════
 # 筛选条件（紧凑一行）
 # ═══════════════════════════════════════════════════════════
 opts = get_filter_options(df)
+st.markdown('<div class="filter-row">', unsafe_allow_html=True)
 fc1, fc2, fc3, fc4, fc5 = st.columns(5)
 with fc1: sku_f = st.multiselect("SKU", opts.get("skus", []), key="g_sku")
 with fc2:
@@ -146,6 +231,7 @@ with fc2:
 with fc3: wh_f = st.multiselect("库房", opts.get("warehouses", []), key="g_wh")
 with fc4: sup_f = st.multiselect("供应商", opts.get("suppliers", []), key="g_sup")
 with fc5: sts_f = st.multiselect("状态", opts.get("statuses", []), key="g_sts")
+st.markdown('</div>', unsafe_allow_html=True)
 
 dr = date_f if date_f and len(date_f) == 2 else None
 filtered = apply_filters(df, skus=sku_f or None, date_range=dr,
@@ -161,7 +247,7 @@ safety_map = dict(zip(st.session_state.get("safety_stock_df", pd.DataFrame(colum
                        st.session_state.get("safety_stock_df", pd.DataFrame(columns=["SKU", "安全库存"]))["安全库存"]))
 rep = calculate_replenishment(filtered, rep_cycle_val, safety_stock=safety_map)
 sku_alert = sku_price_alert_list(filtered, 5.0)
-dt_cycle_val = st.session_state.get("dt_cycle", 10)
+dt_cycle_val = st.session_state.get("dt_cycle", DEFAULT_DELIVERY_CYCLE_DAYS)
 dt = delivery_timeliness(filtered, dt_cycle_val)
 
 # ═══════════════════════════════════════════════════════════
@@ -170,7 +256,7 @@ dt = delivery_timeliness(filtered, dt_cycle_val)
 row1_l, row1_r = st.columns(2)
 
 with row1_l:
-    st.markdown("**📦 SKU 汇总**")
+    card("📦", "SKU 汇总")
     if not agg.empty:
         c1, c2, c3 = st.columns(3)
         c1.metric("SKU总数(个)", f"{len(agg):,}")
@@ -180,9 +266,10 @@ with row1_l:
         download_excel(agg, "SKU汇总.xlsx")
     else:
         st.info("无数据")
+    card_end()
 
 with row1_r:
-    st.markdown("**🏭 供应商总览**")
+    card("🏭", "供应商总览")
     if not sup_ov.empty:
         c1, c2, c3 = st.columns(3)
         c1.metric("供应商总数(个)", f"{len(sup_ov):,}")
@@ -192,20 +279,20 @@ with row1_r:
         download_excel(sup_ov, "供应商总览.xlsx")
     else:
         st.info("无数据")
+    card_end()
 
-st.markdown("---")
-st.markdown("### 采购金额数据分析")
-st.markdown("---")
+section_header("采购金额数据分析")
 
 # ═══════════════════════════════════════════════════════════
 # SKU台账（全宽）
 # ═══════════════════════════════════════════════════════════
-st.markdown("**📋 SKU 台账**")
+card("📋", "SKU 台账")
 if not ledger.empty:
     st.dataframe(ledger, use_container_width=True, hide_index=True, height=130)
     download_excel(ledger, "SKU台账.xlsx")
 else:
     st.info("无数据")
+card_end()
 
 # ═══════════════════════════════════════════════════════════
 # 供应商维度 | 单品维度（两等分）
@@ -213,7 +300,7 @@ else:
 row3_l, row3_r = st.columns(2)
 
 with row3_l:
-    st.markdown("**🔍 供应商维度**")
+    card("🔍", "供应商维度")
     if not sup_ov.empty:
         sel_sup = st.selectbox("供应商", sup_ov["供应商名称"].tolist(), key="sup_detail")
         sup_detail = supplier_sku_detail(filtered, sel_sup)
@@ -231,9 +318,10 @@ with row3_l:
                     st.plotly_chart(pie_chart(sup_detail, "采购数量", "SKU"), use_container_width=True)
         else:
             st.info("该供应商暂无SKU明细")
+    card_end()
 
 with row3_r:
-    st.markdown("**⚖️ 单品维度**")
+    card("⚖️", "单品维度")
     if "SKU" in filtered.columns:
         sku_list = ledger["SKU"].tolist() if not ledger.empty and "SKU" in ledger.columns else sorted(filtered["SKU"].unique())
         sel_sku = st.selectbox("SKU", sku_list, index=0, key="sup_cross")
@@ -252,12 +340,11 @@ with row3_r:
                     st.plotly_chart(bar_chart(comp, "供应商名称", "平均单价"), use_container_width=True)
     else:
         st.info("无SKU数据")
+    card_end()
 
-st.markdown("---")
-st.markdown("### 补货数据分析")
-st.markdown("---")
+section_header("补货数据分析")
 
-st.markdown("**🧮 补货计算**")
+card("🧮", "补货计算")
 rc1, rc2, rc3 = st.columns(3)
 with rc1: rep_cycle = st.number_input("周期(天)", 1, 90, 7, key="rep_cycle")
 with rc2:
@@ -336,6 +423,7 @@ else:
             if st.button("采购需求提报"):
                 st.session_state["_trigger_req_modal"] = True
                 st.rerun()
+card_end()
 
 if st.session_state.pop("_trigger_req_modal", False) and not rep.empty:
     addr_col = "配送中心" if "配送中心" in rep.columns else "送货地址"
@@ -346,15 +434,12 @@ if st.session_state.pop("_trigger_req_modal", False) and not rep.empty:
         modal_data = modal_data[modal_data["SKU"].isin(rep_sku)]
     req_modal(modal_data)
 
-st.markdown("---")
-
-st.markdown("### 采购履约数据分析")
-st.markdown("---")
+section_header("采购履约数据分析")
 
 # ═══════════════════════════════════════════════════════════
 # 履约率（全宽）
 # ═══════════════════════════════════════════════════════════
-st.markdown("**✅ 履约率**")
+card("✅", "履约率")
 if not fr.empty:
     fr_display = fr.copy()
     c1, c2, c3, c4 = st.columns(4)
@@ -412,12 +497,15 @@ if not fr.empty:
             st.plotly_chart(pie_chart(wh_cat, "库房数", "履约类别"), use_container_width=True)
 else:
     st.info("无已完成订单")
+card_end()
 
 # ═══════════════════════════════════════════════════════════
 # 履约时效（全宽）
 # ═══════════════════════════════════════════════════════════
-st.markdown("**⏱️ 履约时效**")
-dt_cycle = st.number_input("周期(天)", 1, 60, 10, key="dt_cycle")
+card("⏱️", "履约时效")
+if "dt_cycle" not in st.session_state:
+    st.session_state["dt_cycle"] = DEFAULT_DELIVERY_CYCLE_DAYS
+dt_cycle = st.number_input("周期(天)", 1, 60, DEFAULT_DELIVERY_CYCLE_DAYS, key="dt_cycle")
 dt_result = delivery_timeliness(filtered, dt_cycle)
 if dt_result.empty:
     st.info("无采购时间数据")
@@ -430,7 +518,7 @@ else:
     c1.metric("正常履约", f"{normal_n:,} ({normal_n/total*100:.1f}%)" if total > 0 else "-")
     c2.metric("轻微逾期", f"{minor_n:,} ({minor_n/total*100:.1f}%)" if total > 0 else "-")
     c3.metric("严重逾期", f"{severe_n:,} ({severe_n/total*100:.1f}%)" if total > 0 else "-")
-    cols = [c for c in ["采购单号", "采购单状态", "采购时间", "预计到货时间",
+    cols = [c for c in ["采购单号", "供应商名称", "采购单状态", "采购时间", "预计到货时间",
                         "履约时效天数", "履约时效状态"] if c in dt_result.columns]
     st.dataframe(dt_result[cols] if cols else dt_result, use_container_width=True, hide_index=True, height=130)
     download_excel(dt_result, "履约时效.xlsx")
@@ -470,15 +558,14 @@ else:
                     )
                     fig_sku.update_layout(margin=dict(l=10, r=10, t=25, b=10), height=200, showlegend=False)
                     st.plotly_chart(fig_sku, use_container_width=True)
+card_end()
 
-st.markdown("---")
-st.markdown("### 采购预警数据分析")
-st.markdown("---")
+section_header("采购预警数据分析")
 
 # ═══════════════════════════════════════════════════════════
 # 价格预警（全宽）
 # ═══════════════════════════════════════════════════════════
-st.markdown("**⚠️ 价格预警**")
+card("⚠️", "价格预警")
 sku_alert_result = sku_price_alert_list(filtered, 5.0)
 if not sku_alert_result.empty:
     if "SKU" in sku_alert_result.columns:
