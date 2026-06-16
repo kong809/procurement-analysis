@@ -114,7 +114,9 @@ h3 { font-size: 0.95rem !important; font-weight: 600 !important; color: #374151 
     font-size: 1.05rem; font-weight: 700; color: #1e40af;
     padding: 6px 0; margin: 8px 0 4px 0;
     border-left: 4px solid #3b82f6; padding-left: 10px;
+    scroll-margin-top: 60px;
 }
+a[name] { scroll-margin-top: 60px; display: block; }
 
 /* ─ Metric 卡片 ─ */
 .stMetric {
