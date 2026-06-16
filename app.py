@@ -25,8 +25,9 @@ def card_end():
     st.markdown('</div>', unsafe_allow_html=True)
 
 
-def section_header(title, anchor_id):
-    st.markdown(f'<div id="{anchor_id}" class="section-header">{title}</div>', unsafe_allow_html=True)
+def section_header(title, anchor_id=""):
+    aid = f' id="{anchor_id}"' if anchor_id else ""
+    st.markdown(f'<div class="section-header"{aid}>{title}</div>', unsafe_allow_html=True)
 
 
 @st.dialog("采购需求提报", width="large")
@@ -153,23 +154,25 @@ h3 { font-size: 0.95rem !important; font-weight: 600 !important; color: #374151 
 /* ─ 分隔线 ─ */
 hr { margin-top: 4px !important; margin-bottom: 4px !important; border-color: #f3f4f6 !important; }
 
-/* ─ 侧边栏样式 ─ */
+/* ─ 侧边栏导航 ─ */
 section[data-testid="stSidebar"] {
     background: #ffffff !important;
     border-right: 1px solid #e5e7eb !important;
 }
-section[data-testid="stSidebar"] .sidebar-content {
-    padding-top: 1rem !important;
+section[data-testid="stSidebar"] .sidebar-nav-title {
+    font-size: 1rem; font-weight: 700; color: #1e40af;
+    padding: 12px 16px 8px; border-bottom: 2px solid #e5e7eb;
+    margin-bottom: 4px;
 }
-.nav-link {
-    display: flex; align-items: center; gap: 8px;
-    padding: 8px 14px; margin: 2px 0;
-    border-radius: 8px; color: #374151; text-decoration: none;
-    font-size: 13px; font-weight: 500;
-    transition: all 0.15s;
+section[data-testid="stSidebar"] .sidebar-nav-item {
+    display: block; padding: 8px 16px; margin: 2px 8px;
+    border-radius: 6px; font-size: 13px; color: #374151;
+    text-decoration: none; transition: all 0.15s; cursor: pointer;
 }
-.nav-link:hover { background: #eff6ff; color: #1e40af; }
-.nav-link .nav-icon { font-size: 15px; width: 20px; text-align: center; }
+section[data-testid="stSidebar"] .sidebar-nav-item:hover {
+    background: #eff6ff; color: #1e40af;
+}
+section[data-testid="stSidebar"] [data-testid="stSidebarNav"] { display: none !important; }
 
 /* ─ 筛选行 ─ */
 .filter-row {
@@ -183,9 +186,9 @@ section[data-testid="stSidebar"] .sidebar-content {
 
 st.markdown("## 📊 采购单智能分析")
 
-# ── 左侧导航 ──
+# ── 侧边栏导航 ──
 with st.sidebar:
-    st.markdown("### 📋 快捷导航")
+    st.markdown('<div class="sidebar-nav-title">📑 快捷导航</div>', unsafe_allow_html=True)
     nav_items = [
         ("📦", "基础数据分析", "sec-basic"),
         ("💰", "采购金额数据分析", "sec-amount"),
@@ -194,9 +197,7 @@ with st.sidebar:
         ("⚠️", "采购预警数据分析", "sec-alert"),
     ]
     for icon, label, anchor in nav_items:
-        st.markdown(f'<a class="nav-link" href="javascript:document.getElementById(\'{anchor}\').scrollIntoView({{behavior:\'smooth\',block:\'start\'}})"><span class="nav-icon">{icon}</span>{label}</a>', unsafe_allow_html=True)
-    st.markdown("---")
-    st.caption("点击跳转到对应分析区域")
+        st.markdown(f'<a class="sidebar-nav-item" href="javascript:document.getElementById(\'{anchor}\').scrollIntoView({{behavior:\'smooth\'}})">{icon} {label}</a>', unsafe_allow_html=True)
 
 # ═══════════════════════════════════════════════════════════
 # 数据上传区 —— 始终可见，新上传覆盖旧数据
