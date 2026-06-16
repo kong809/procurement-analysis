@@ -161,18 +161,23 @@ hr { margin-top: 4px !important; margin-bottom: 4px !important; border-color: #f
 section[data-testid="stSidebar"] {
     background: #ffffff !important;
     border-right: 1px solid #e5e7eb !important;
+    width: fit-content !important;
+    min-width: unset !important;
+    max-width: 220px !important;
 }
+section[data-testid="stSidebar"] > div:first-child { width: fit-content !important; }
 section[data-testid="stSidebar"] .sidebar-nav-title {
-    font-size: 1rem; font-weight: 700; color: #1e40af;
-    padding: 12px 16px 8px; border-bottom: 2px solid #e5e7eb;
-    margin-bottom: 4px;
+    font-size: 0.92rem; font-weight: 700; color: #1e40af;
+    padding: 10px 12px 6px; border-bottom: 2px solid #e5e7eb;
+    margin-bottom: 4px; white-space: nowrap;
 }
 section[data-testid="stSidebar"] [data-testid="stSidebarNav"] { display: none !important; }
 section[data-testid="stSidebar"] button[kind="secondary"] {
     background: transparent !important; border: none !important;
-    text-align: left !important; padding: 8px 16px !important;
-    font-size: 13px !important; color: #374151 !important;
+    text-align: left !important; padding: 6px 12px !important;
+    font-size: 12px !important; color: #374151 !important;
     border-radius: 6px !important; transition: all 0.15s;
+    white-space: nowrap !important;
 }
 section[data-testid="stSidebar"] button[kind="secondary"]:hover {
     background: #eff6ff !important; color: #1e40af !important;
