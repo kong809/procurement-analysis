@@ -74,6 +74,46 @@ def req_modal(df_data):
             pass
 
 
+@st.dialog("📌 功能引导", width="large")
+def guide_modal():
+    st.markdown("""
+    **整体操作逻辑：** 导入采销工作台导出的采购单明细表格，即可生成多维度数据分析内容。
+
+    ---
+
+    **📦 基础数据分析**
+
+    支持剔除单据维度，按SKU、供应商双维度，对指定周期内采购数量、实收数量、采购金额、采购单价等指标开展统计分析。
+
+    ---
+
+    **💰 采购金额数据分析**
+
+    围绕采购金额，提供SKU、供应商维度精细化分析视图；可查看单供应商下各SKU采购金额分布，针对一品多商业务场景，支持查看同一SKU在不同供应商侧的供货分布、采购单价及采购金额占比。
+
+    ---
+
+    **🧮 补货数据分析**
+
+    面向手动补货需求用户，通过补货模块测算所需补货量；支持一键点击「采购需求提报」完成补货操作，快速生成对应采购单，实现快捷补货。
+
+    ---
+
+    **✅ 采购履约数据分析**
+
+    从采购单履约率、履约时效两大维度进行数据查看；支持自定义调整履约周期，直观展示采购单正常时效、轻微逾期、严重逾期三类单据区间及对应占比。
+
+    ---
+
+    **⚠️ 采购预警数据分析**
+
+    系统针对同一SKU多供应商价差异常自动触发预警：同SKU采购价高出最低价8%-15%触发二级预警；高出最低价15%及以上触发一级预警。
+    """)
+    if st.button("我知道了", type="primary", use_container_width=True, key="guide_close"):
+        st.session_state["guide_dismissed"] = True
+        st.rerun()
+
+
 st.set_page_config(page_title="采购单智能分析", page_icon="📊", layout="wide")
 
 # ── 全局样式：白底卡片风 ──
@@ -239,6 +279,15 @@ with st.sidebar:
                 </script>""",
                 height=0,
             )
+    st.markdown("---")
+    if st.button("📌 功能引导", use_container_width=True, key="nav_guide"):
+        st.session_state["guide_dismissed"] = False
+
+# ── 首次进入引导 ──
+if "guide_dismissed" not in st.session_state:
+    st.session_state["guide_dismissed"] = False
+if not st.session_state["guide_dismissed"] and "merged_df" not in st.session_state:
+    guide_modal()
 
 # ═══════════════════════════════════════════════════════════
 # 数据上传区 —— 始终可见，新上传覆盖旧数据
