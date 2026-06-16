@@ -523,41 +523,45 @@ else:
     st.dataframe(dt_result[cols] if cols else dt_result, use_container_width=True, hide_index=True, height=130)
     download_excel(dt_result, "履约时效.xlsx")
 
-    # 严重逾期 Top10 柱状图（供应商 & SKU）
-    severe_orders = dt_result[dt_result["履约时效状态"] == "严重逾期"]
-    if not severe_orders.empty:
-        severe_with_dim = severe_orders.merge(
-            filtered[["采购单号", "供应商名称", "SKU", "SKU名称"]].drop_duplicates(subset=["采购单号"]),
-            on="采购单号", how="left",
-        )
+    # 逾期 Top10 柱状图（供应商 & SKU）
+    overdue_orders = dt_result[dt_result["履约时效状态"].isin(["轻微逾期", "严重逾期"])]
+    if not overdue_orders.empty:
         bc1, bc2 = st.columns(2)
         with bc1:
-            if "供应商名称" in severe_with_dim.columns:
-                sup_severe = severe_with_dim.groupby("供应商名称").agg(严重逾期数=("采购单号", "nunique")).reset_index()
-                sup_severe = sup_severe.sort_values("严重逾期数", ascending=False).head(10)
-                if not sup_severe.empty:
-                    st.caption("供应商严重逾期 Top10")
-                    fig_sup = px.bar(sup_severe, x="供应商名称", y="严重逾期数")
+            if "供应商名称" in overdue_orders.columns:
+                sup_overdue = overdue_orders.groupby("供应商名称").agg(逾期数=("采购单号", "nunique")).reset_index()
+                sup_overdue = sup_overdue.sort_values("逾期数", ascending=False).head(10)
+                if not sup_overdue.empty:
+                    st.caption("供应商逾期 Top10")
+                    fig_sup = px.bar(sup_overdue, x="供应商名称", y="逾期数", color_discrete_sequence=["#ef4444"])
                     fig_sup.update_traces(texttemplate="%{y}", textposition="outside")
-                    fig_sup.update_layout(margin=dict(l=10, r=10, t=25, b=10), height=200, showlegend=False)
+                    fig_sup.update_layout(margin=dict(l=10, r=10, t=25, b=10), height=220, showlegend=False, plot_bgcolor="#fff", paper_bgcolor="#fff")
                     st.plotly_chart(fig_sup, use_container_width=True)
         with bc2:
-            if "SKU" in severe_with_dim.columns:
-                sku_label_col = "SKU名称" if "SKU名称" in severe_with_dim.columns else "SKU"
-                sku_severe = severe_with_dim.groupby(sku_label_col).agg(严重逾期数=("采购单号", "nunique")).reset_index()
-                sku_severe = sku_severe.sort_values("严重逾期数", ascending=False).head(10)
-                if not sku_severe.empty:
-                    sku_severe["SKU名称_短"] = sku_severe[sku_label_col].astype(str).str[:3] + "…"
-                    sku_severe["SKU名称_全"] = sku_severe[sku_label_col].astype(str)
-                    st.caption("SKU严重逾期 Top10")
-                    fig_sku = px.bar(sku_severe, x="SKU名称_短", y="严重逾期数")
-                    fig_sku.update_traces(
-                        texttemplate="%{y}", textposition="outside",
-                        hovertemplate="SKU名称：%{customdata[0]}<br>严重逾期数：%{y}<extra></extra>",
-                        customdata=sku_severe[["SKU名称_全"]],
-                    )
-                    fig_sku.update_layout(margin=dict(l=10, r=10, t=25, b=10), height=200, showlegend=False)
-                    st.plotly_chart(fig_sku, use_container_width=True)
+            sku_data = filtered[["采购单号", "SKU", "SKU名称"]].drop_duplicates(subset=["采购单号"]) if "SKU" in filtered.columns else pd.DataFrame()
+            if not sku_data.empty:
+                overdue_with_sku = overdue_orders.merge(sku_data, on="采购单号", how="left")
+                if "SKU名称" in overdue_with_sku.columns:
+                    sku_label_col = "SKU名称"
+                elif "SKU" in overdue_with_sku.columns:
+                    sku_label_col = "SKU"
+                else:
+                    sku_label_col = None
+                if sku_label_col:
+                    sku_overdue = overdue_with_sku.groupby(sku_label_col).agg(逾期数=("采购单号", "nunique")).reset_index()
+                    sku_overdue = sku_overdue.sort_values("逾期数", ascending=False).head(10)
+                    if not sku_overdue.empty:
+                        sku_overdue["名称_短"] = sku_overdue[sku_label_col].astype(str).str[:6] + "…"
+                        sku_overdue["名称_全"] = sku_overdue[sku_label_col].astype(str)
+                        st.caption("SKU逾期 Top10")
+                        fig_sku = px.bar(sku_overdue, x="名称_短", y="逾期数", color_discrete_sequence=["#f97316"])
+                        fig_sku.update_traces(
+                            texttemplate="%{y}", textposition="outside",
+                            hovertemplate="%{customdata[0]}<br>逾期数：%{y}<extra></extra>",
+                            customdata=sku_overdue[["名称_全"]],
+                        )
+                        fig_sku.update_layout(margin=dict(l=10, r=10, t=25, b=10), height=220, showlegend=False, plot_bgcolor="#fff", paper_bgcolor="#fff")
+                        st.plotly_chart(fig_sku, use_container_width=True)
 card_end()
 
 section_header("采购预警数据分析")
