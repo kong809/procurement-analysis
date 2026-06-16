@@ -25,8 +25,8 @@ def card_end():
     st.markdown('</div>', unsafe_allow_html=True)
 
 
-def section_header(title):
-    st.markdown(f'<div class="section-header">{title}</div>', unsafe_allow_html=True)
+def section_header(title, anchor_id):
+    st.markdown(f'<div id="{anchor_id}" class="section-header">{title}</div>', unsafe_allow_html=True)
 
 
 @st.dialog("采购需求提报", width="large")
@@ -153,8 +153,23 @@ h3 { font-size: 0.95rem !important; font-weight: 600 !important; color: #374151 
 /* ─ 分隔线 ─ */
 hr { margin-top: 4px !important; margin-bottom: 4px !important; border-color: #f3f4f6 !important; }
 
-/* ─ 隐藏侧边栏 ─ */
-section[data-testid="stSidebar"] { display: none !important; }
+/* ─ 侧边栏样式 ─ */
+section[data-testid="stSidebar"] {
+    background: #ffffff !important;
+    border-right: 1px solid #e5e7eb !important;
+}
+section[data-testid="stSidebar"] .sidebar-content {
+    padding-top: 1rem !important;
+}
+.nav-link {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 14px; margin: 2px 0;
+    border-radius: 8px; color: #374151; text-decoration: none;
+    font-size: 13px; font-weight: 500;
+    transition: all 0.15s;
+}
+.nav-link:hover { background: #eff6ff; color: #1e40af; }
+.nav-link .nav-icon { font-size: 15px; width: 20px; text-align: center; }
 
 /* ─ 筛选行 ─ */
 .filter-row {
@@ -167,6 +182,21 @@ section[data-testid="stSidebar"] { display: none !important; }
 </style>""", unsafe_allow_html=True)
 
 st.markdown("## 📊 采购单智能分析")
+
+# ── 左侧导航 ──
+with st.sidebar:
+    st.markdown("### 📋 快捷导航")
+    nav_items = [
+        ("📦", "基础数据分析", "sec-basic"),
+        ("💰", "采购金额数据分析", "sec-amount"),
+        ("🧮", "补货数据分析", "sec-replenish"),
+        ("✅", "采购履约数据分析", "sec-fulfillment"),
+        ("⚠️", "采购预警数据分析", "sec-alert"),
+    ]
+    for icon, label, anchor in nav_items:
+        st.markdown(f'<a class="nav-link" href="javascript:document.getElementById(\'{anchor}\').scrollIntoView({{behavior:\'smooth\',block:\'start\'}})"><span class="nav-icon">{icon}</span>{label}</a>', unsafe_allow_html=True)
+    st.markdown("---")
+    st.caption("点击跳转到对应分析区域")
 
 # ═══════════════════════════════════════════════════════════
 # 数据上传区 —— 始终可见，新上传覆盖旧数据
@@ -217,7 +247,7 @@ else:
     df = pd.DataFrame()
     st.caption("当前数据：未上传")
 
-section_header("基础数据分析")
+section_header("基础数据分析", "sec-basic")
 
 # ═══════════════════════════════════════════════════════════
 # 筛选条件（紧凑一行）
@@ -306,7 +336,7 @@ with row1_r:
         st.info("请上传数据")
     card_end()
 
-section_header("采购金额数据分析")
+section_header("采购金额数据分析", "sec-amount")
 
 # ═══════════════════════════════════════════════════════════
 # SKU台账（全宽）
@@ -369,7 +399,7 @@ with row3_r:
         st.info("请上传数据")
     card_end()
 
-section_header("补货数据分析")
+section_header("补货数据分析", "sec-replenish")
 
 card("🧮", "补货计算")
 if has_data:
@@ -461,7 +491,7 @@ if has_data and st.session_state.pop("_trigger_req_modal", False) and not rep.em
         modal_data = modal_data[modal_data["SKU"].isin(rep_sku)]
     req_modal(modal_data)
 
-section_header("采购履约数据分析")
+section_header("采购履约数据分析", "sec-fulfillment")
 
 # ═══════════════════════════════════════════════════════════
 # 履约率（全宽）
@@ -606,7 +636,7 @@ else:
                         st.plotly_chart(fig_sku, use_container_width=True)
 card_end()
 
-section_header("采购预警数据分析")
+section_header("采购预警数据分析", "sec-alert")
 
 # ═══════════════════════════════════════════════════════════
 # 价格预警（全宽）
