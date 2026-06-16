@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import plotly.express as px
 import io
@@ -26,8 +27,10 @@ def card_end():
 
 
 def section_header(title, anchor_id=""):
-    aid = f' id="{anchor_id}"' if anchor_id else ""
-    st.markdown(f'<div class="section-header"{aid}>{title}</div>', unsafe_allow_html=True)
+    if anchor_id:
+        st.markdown(f'<a name="{anchor_id}"></a><div class="section-header" id="{anchor_id}">{title}</div>', unsafe_allow_html=True)
+    else:
+        st.markdown(f'<div class="section-header">{title}</div>', unsafe_allow_html=True)
 
 
 @st.dialog("采购需求提报", width="large")
@@ -164,15 +167,16 @@ section[data-testid="stSidebar"] .sidebar-nav-title {
     padding: 12px 16px 8px; border-bottom: 2px solid #e5e7eb;
     margin-bottom: 4px;
 }
-section[data-testid="stSidebar"] .sidebar-nav-item {
-    display: block; padding: 8px 16px; margin: 2px 8px;
-    border-radius: 6px; font-size: 13px; color: #374151;
-    text-decoration: none; transition: all 0.15s; cursor: pointer;
-}
-section[data-testid="stSidebar"] .sidebar-nav-item:hover {
-    background: #eff6ff; color: #1e40af;
-}
 section[data-testid="stSidebar"] [data-testid="stSidebarNav"] { display: none !important; }
+section[data-testid="stSidebar"] button[kind="secondary"] {
+    background: transparent !important; border: none !important;
+    text-align: left !important; padding: 8px 16px !important;
+    font-size: 13px !important; color: #374151 !important;
+    border-radius: 6px !important; transition: all 0.15s;
+}
+section[data-testid="stSidebar"] button[kind="secondary"]:hover {
+    background: #eff6ff !important; color: #1e40af !important;
+}
 
 /* ─ 筛选行 ─ */
 .filter-row {
@@ -190,14 +194,44 @@ st.markdown("## 📊 采购单智能分析")
 with st.sidebar:
     st.markdown('<div class="sidebar-nav-title">📑 快捷导航</div>', unsafe_allow_html=True)
     nav_items = [
-        ("📦", "基础数据分析", "sec-basic"),
-        ("💰", "采购金额数据分析", "sec-amount"),
-        ("🧮", "补货数据分析", "sec-replenish"),
-        ("✅", "采购履约数据分析", "sec-fulfillment"),
-        ("⚠️", "采购预警数据分析", "sec-alert"),
+        ("📦 基础数据分析", "sec-basic"),
+        ("💰 采购金额数据分析", "sec-amount"),
+        ("🧮 补货数据分析", "sec-replenish"),
+        ("✅ 采购履约数据分析", "sec-fulfillment"),
+        ("⚠️ 采购预警数据分析", "sec-alert"),
     ]
-    for icon, label, anchor in nav_items:
-        st.markdown(f'<a class="sidebar-nav-item" href="javascript:document.getElementById(\'{anchor}\').scrollIntoView({{behavior:\'smooth\'}})">{icon} {label}</a>', unsafe_allow_html=True)
+    for label, anchor in nav_items:
+        if st.button(label, key=f"nav_{anchor}", use_container_width=True):
+            components.html(
+                f"""<script>
+                function findAndScroll(doc) {{
+                    var el = doc.getElementById('{anchor}');
+                    if (!el) el = doc.querySelector('[name="{anchor}"]');
+                    if (!el) {{
+                        var all = doc.querySelectorAll('.section-header');
+                        for (var i=0; i<all.length; i++) {{
+                            if (all[i].textContent.trim().indexOf('{label[2:]}') !== -1) {{
+                                el = all[i]; break;
+                            }}
+                        }}
+                    }}
+                    if (el) el.scrollIntoView({{behavior:'smooth', block:'start'}});
+                    return !!el;
+                }}
+                if (!findAndScroll(document)) {{
+                    var frames = document.querySelectorAll('iframe');
+                    for (var i=0; i<frames.length; i++) {{
+                        try {{ if (findAndScroll(frames[i].contentDocument)) break; }} catch(e) {{}}
+                    }}
+                    var w = window;
+                    while (w.parent && w.parent !== w) {{
+                        try {{ if (findAndScroll(w.parent.document)) break; }} catch(e) {{}}
+                        w = w.parent;
+                    }}
+                }}
+                </script>""",
+                height=0,
+            )
 
 # ═══════════════════════════════════════════════════════════
 # 数据上传区 —— 始终可见，新上传覆盖旧数据
