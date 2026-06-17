@@ -1,7 +1,9 @@
 import pandas as pd
 import numpy as np
+import streamlit as st
 
 
+@st.cache_data
 def supplier_overview(df: pd.DataFrame) -> pd.DataFrame:
     if "供应商名称" not in df.columns:
         return pd.DataFrame()
@@ -30,6 +32,7 @@ def supplier_overview(df: pd.DataFrame) -> pd.DataFrame:
     return result[col_order].sort_values("累计采购金额", ascending=False)
 
 
+@st.cache_data
 def supplier_sku_detail(df: pd.DataFrame, supplier_name: str) -> pd.DataFrame:
     if "供应商名称" not in df.columns or not supplier_name:
         return pd.DataFrame()
@@ -66,6 +69,7 @@ def supplier_sku_detail(df: pd.DataFrame, supplier_name: str) -> pd.DataFrame:
     return result[col_order].sort_values("采购金额", ascending=False)
 
 
+@st.cache_data
 def supplier_cross_comparison(df: pd.DataFrame, sku: str) -> pd.DataFrame:
     if "SKU" not in df.columns or "供应商名称" not in df.columns or not sku:
         return pd.DataFrame()

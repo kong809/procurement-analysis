@@ -1,7 +1,9 @@
 import pandas as pd
 import numpy as np
+import streamlit as st
 
 
+@st.cache_data
 def calculate_replenishment(
     df: pd.DataFrame,
     cycle_days: int,

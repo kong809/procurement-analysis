@@ -1,7 +1,9 @@
 import pandas as pd
 import numpy as np
+import streamlit as st
 
 
+@st.cache_data
 def sku_aggregate(df: pd.DataFrame) -> pd.DataFrame:
     required = ["SKU"]
     if not all(c in df.columns for c in required):
@@ -40,6 +42,7 @@ def sku_aggregate(df: pd.DataFrame) -> pd.DataFrame:
     return result[col_order]
 
 
+@st.cache_data
 def sku_ledger(df: pd.DataFrame) -> pd.DataFrame:
     required = ["SKU"]
     if not all(c in df.columns for c in required):

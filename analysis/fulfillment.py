@@ -1,10 +1,12 @@
 import pandas as pd
 import numpy as np
+import streamlit as st
 from datetime import datetime
 from config.settings import STATUS_COMPLETED, FULFILLMENT_FULL, FULFILLMENT_PARTIAL, FULFILLMENT_NONE
 from config.settings import TIMELINESS_NORMAL, TIMELINESS_MINOR, TIMELINESS_SEVERE
 
 
+@st.cache_data
 def fulfillment_rate(df: pd.DataFrame) -> pd.DataFrame:
     required = ["SKU", "原始采购数量", "实收数量"]
     if not all(c in df.columns for c in required):
@@ -119,6 +121,7 @@ def fulfillment_summary_by_dimension(df: pd.DataFrame, dimension: str = "SKU") -
     return summary
 
 
+@st.cache_data
 def delivery_timeliness(df: pd.DataFrame, cycle_days: int = 10) -> pd.DataFrame:
     required = ["采购单号", "采购时间"]
     if not all(c in df.columns for c in required):

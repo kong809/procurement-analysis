@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import streamlit as st
 from config.settings import LARGE_ORDER_AMOUNT
 
 
@@ -128,6 +129,7 @@ def _classify_same_supplier(row):
     return "黄色（常规提醒）"
 
 
+@st.cache_data
 def sku_price_alert_list(df: pd.DataFrame, threshold: float = 5.0) -> pd.DataFrame:
     required = ["SKU", "供应商名称", "SKU单价"]
     if not all(c in df.columns for c in required):
