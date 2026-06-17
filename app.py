@@ -306,10 +306,6 @@ with st.sidebar:
                 </script>""",
                 height=0,
             )
-    st.markdown("---")
-    if st.button("📌 功能引导", use_container_width=True, key="nav_guide"):
-        st.session_state["guide_step"] = 0
-        st.rerun()
 
 # ═══════════════════════════════════════════════════════════
 # 数据上传区 —— 放在布局之前，确保 session_state 先更新
