@@ -897,7 +897,7 @@ with _main_col:
                                 hovertemplate="%{customdata[0]}<br>逾期数：%{y}<extra></extra>",
                                 customdata=sku_overdue[["名称_全"]],
                             )
-                            fig_sku.update_layout(margin=dict(l=10, r=10, t=25, b=10), height=220, showlegend=False, plot_bgcolor="#fff", paper_bgcolor="#fff", xaxis_title="供应商名称")
+                            fig_sku.update_layout(margin=dict(l=10, r=10, t=25, b=30), height=220, showlegend=False, plot_bgcolor="#fff", paper_bgcolor="#fff", xaxis_title="供应商名称", xaxis_tickangle=-30)
                             st.plotly_chart(fig_sku, use_container_width=True)
     card_end()
 
