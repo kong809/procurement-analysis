@@ -869,10 +869,14 @@ with _main_col:
                     sup_overdue = overdue_orders.groupby("供应商名称").agg(逾期数=("采购单号", "nunique")).reset_index()
                     sup_overdue = sup_overdue.sort_values("逾期数", ascending=False).head(10)
                     if not sup_overdue.empty:
+                        sup_overdue["名称_短"] = sup_overdue["供应商名称"].astype(str).str[:3] + "…"
+                        sup_overdue["名称_全"] = sup_overdue["供应商名称"].astype(str)
                         st.caption("供应商逾期 Top10")
-                        fig_sup = px.bar(sup_overdue, x="供应商名称", y="逾期数", color_discrete_sequence=["#ef4444"])
-                        fig_sup.update_traces(texttemplate="%{y}", textposition="outside")
-                        fig_sup.update_layout(margin=dict(l=10, r=10, t=25, b=10), height=220, showlegend=False, plot_bgcolor="#fff", paper_bgcolor="#fff")
+                        fig_sup = px.bar(sup_overdue, x="名称_短", y="逾期数", color_discrete_sequence=["#ef4444"])
+                        fig_sup.update_traces(texttemplate="%{y}", textposition="outside",
+                                              customdata=sup_overdue[["名称_全"]].values,
+                                              hovertemplate="%{customdata[0]}<br>逾期数：%{y}<extra></extra>")
+                        fig_sup.update_layout(margin=dict(l=10, r=10, t=25, b=30), height=220, showlegend=False, plot_bgcolor="#fff", paper_bgcolor="#fff", xaxis_tickangle=-30)
                         st.plotly_chart(fig_sup, use_container_width=True)
             with bc2:
                 sku_data = filtered[["采购单号", "SKU", "SKU名称"]].drop_duplicates(subset=["采购单号"]) if "SKU" in filtered.columns else pd.DataFrame()
