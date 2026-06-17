@@ -318,6 +318,53 @@ with st.sidebar:
         st.session_state["guide_step"] = 0
         st.rerun()
 
+# ═══════════════════════════════════════════════════════════
+# 数据上传区 —— 放在布局之前，确保 session_state 先更新
+# ═══════════════════════════════════════════════════════════
+with st.expander("📤 数据上传", expanded=("merged_df" not in st.session_state)):
+    uploaded_files = st.file_uploader(
+        "上传采购单 Excel 文件（支持 .xls / .xlsx，可多文件）",
+        type=["xls", "xlsx"],
+        accept_multiple_files=True,
+        key="_file_uploader",
+    )
+
+    if uploaded_files:
+        file_key = tuple(f.name for f in uploaded_files)
+        if st.session_state.get("_processed_files") != file_key:
+            with st.spinner("解析中..."):
+                sheets = read_excel_files(uploaded_files)
+
+            if sheets:
+                raw_columns = list(dict.fromkeys(c for df in sheets.values() for c in df.columns))
+                match_result = match_headers(raw_columns)
+
+                fuzzy_overrides = dict(match_result["fuzzy"]) if match_result["fuzzy"] else {}
+
+                final_mapping = apply_mapping(raw_columns, match_result["auto"], fuzzy_overrides)
+                merged = merge_dataframes(sheets, column_mapping=final_mapping)
+                merged = clean_dataframe(merged)
+
+                st.session_state["merged_df"] = merged
+                st.session_state["_processed_files"] = file_key
+                for key in list(st.session_state.keys()):
+                    if key.startswith("_calc_"):
+                        del st.session_state[key]
+
+                auto_n = len([k for k, v in match_result["auto"].items() if v != k])
+                fuzzy_n = len(match_result["fuzzy"])
+                msg = f"数据就绪：{len(merged):,} 行 × {len(merged.columns)} 列 | 自动匹配 {auto_n} 列"
+                if fuzzy_n:
+                    msg += f"，模糊匹配 {fuzzy_n} 列"
+                st.success(msg)
+    else:
+        if "merged_df" in st.session_state:
+            del st.session_state["merged_df"]
+            st.session_state.pop("_processed_files", None)
+            for key in list(st.session_state.keys()):
+                if key.startswith("_calc_"):
+                    del st.session_state[key]
+
 # ── 右侧功能说明栏 ──
 has_data_pre = "merged_df" in st.session_state and not st.session_state["merged_df"].empty
 _main_col, _info_col = st.columns([3, 1])
@@ -369,44 +416,6 @@ with _info_col:
         _info_placeholder = st.empty()
 
 with _main_col:
-    # ═══════════════════════════════════════════════════════════
-    # 数据上传区 —— 始终可见，新上传覆盖旧数据
-    # ═══════════════════════════════════════════════════════════
-    with st.expander("📤 数据上传", expanded=("merged_df" not in st.session_state)):
-        uploaded_files = st.file_uploader(
-            "上传采购单 Excel 文件（支持 .xls / .xlsx，可多文件）",
-            type=["xls", "xlsx"],
-            accept_multiple_files=True,
-            key="_file_uploader",
-        )
-
-        if uploaded_files:
-            with st.spinner("解析中..."):
-                sheets = read_excel_files(uploaded_files)
-
-            if sheets:
-                raw_columns = list(dict.fromkeys(c for df in sheets.values() for c in df.columns))
-                match_result = match_headers(raw_columns)
-
-                fuzzy_overrides = dict(match_result["fuzzy"]) if match_result["fuzzy"] else {}
-
-                final_mapping = apply_mapping(raw_columns, match_result["auto"], fuzzy_overrides)
-                merged = merge_dataframes(sheets, column_mapping=final_mapping)
-                merged = clean_dataframe(merged)
-
-                st.session_state["merged_df"] = merged
-                for key in list(st.session_state.keys()):
-                    if key.startswith("_calc_"):
-                        del st.session_state[key]
-
-                auto_n = len([k for k, v in match_result["auto"].items() if v != k])
-                fuzzy_n = len(match_result["fuzzy"])
-                msg = f"数据就绪：{len(merged):,} 行 × {len(merged.columns)} 列 | 自动匹配 {auto_n} 列"
-                if fuzzy_n:
-                    msg += f"，模糊匹配 {fuzzy_n} 列"
-                st.success(msg)
-                st.rerun()
-
     # ═══════════════════════════════════════════════════════════
     # 数据状态判断
     # ═══════════════════════════════════════════════════════════
