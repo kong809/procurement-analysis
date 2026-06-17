@@ -201,11 +201,6 @@ section[data-testid="stSidebar"] button[kind="secondary"]:hover {
 .info-sidebar {
     background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
     padding: 18px 16px;
-    position: sticky;
-    top: 16px;
-    max-height: calc(100vh - 32px);
-    overflow-y: auto;
-    z-index: 10;
 }
 .info-sidebar::-webkit-scrollbar { width: 4px; }
 .info-sidebar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -266,26 +261,6 @@ section[data-testid="stSidebar"] button[kind="secondary"]:hover {
     to { opacity: 1; transform: translateY(0); }
 }
 </style>""", unsafe_allow_html=True)
-
-# 修复 Streamlit overflow:hidden 导致 position:sticky 失效
-components.html("""<script>
-function fixStickySidebar() {
-    var els = document.querySelectorAll('.info-sidebar');
-    els.forEach(function(el) {
-        var parent = el.parentElement;
-        while (parent && parent !== document.body) {
-            var style = getComputedStyle(parent);
-            if (style.overflow === 'hidden' || style.overflow === 'auto') {
-                parent.style.overflow = 'visible';
-            }
-            parent = parent.parentElement;
-        }
-    });
-}
-// 首次执行 + 定期修复（Streamlit 重新渲染会重置样式）
-fixStickySidebar();
-setInterval(fixStickySidebar, 1000);
-</script>""", height=0)
 
 st.markdown("## 👋 您好,我是你的采购单智能数据分析助手!")
 
