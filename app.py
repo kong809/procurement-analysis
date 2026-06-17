@@ -239,7 +239,7 @@ section[data-testid="stSidebar"] button[kind="secondary"]:hover {
 }
 </style>""", unsafe_allow_html=True)
 
-st.markdown("## 📊 采购单智能分析")
+st.markdown("## 👋 您好,我是你的采购单智能数据分析助手!")
 
 # ── 侧边栏导航 ──
 with st.sidebar:
