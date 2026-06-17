@@ -550,7 +550,10 @@ with _main_col:
             level2 = len(sku_alert[sku_alert["超阈值程度"] == "二级预警"])
             level3 = len(sku_alert[sku_alert["超阈值程度"] == "三级预警"])
             total_alert = level1 + level2 + level3
-            summary_lines.append(f'<div class="summary-row summary-warn"><span class="summary-icon">🚨</span> 价格预警：<b>{total_alert}</b> 条异常（一级 {level1} / 二级 {level2} / 三级 {level3}）</div>')
+            summary_lines.append(f'<div class="summary-row summary-warn"><span class="summary-icon">🚨</span> 价格预警：<b>{total_alert}</b> 条异常</div>')
+            summary_lines.append(f'<div class="summary-row summary-warn-detail">🔴 一级预警(≥15%)：<b>{level1}</b> 条</div>')
+            summary_lines.append(f'<div class="summary-row summary-warn-detail">🟠 二级预警(8%-15%)：<b>{level2}</b> 条</div>')
+            summary_lines.append(f'<div class="summary-row summary-warn-detail">🟡 三级预警(5%-8%)：<b>{level3}</b> 条</div>')
 
             if "SKU" in sku_alert.columns and total_alert > 0:
                 alert_skus = sku_alert[sku_alert["超阈值程度"].isin(["一级预警", "二级预警"])]
