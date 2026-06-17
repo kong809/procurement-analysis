@@ -5,14 +5,15 @@ import plotly.graph_objects as go
 def bar_chart(df, x, y, title="", color=None, orientation="v"):
     fig = px.bar(df, x=x, y=y, title=title, color=color, orientation=orientation)
     fig.update_traces(texttemplate="%{y:.2f}", textposition="outside")
-    fig.update_layout(margin=dict(l=10, r=10, t=25, b=10), height=190)
+    fig.update_layout(margin=dict(l=10, r=10, t=25, b=40), height=190, xaxis_tickangle=-30)
     return fig
 
 
 def pie_chart(df, values, names, title="", hole=0.4):
     fig = px.pie(df, values=values, names=names, hole=hole)
-    fig.update_traces(texttemplate="%{percent:.2%}", textinfo="percent")
-    fig.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=160, showlegend=True)
+    fig.update_traces(textposition="inside", textinfo="label+percent",
+                      texttemplate="%{label}<br>%{percent:.1%}")
+    fig.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=200, showlegend=False)
     return fig
 
 
