@@ -452,9 +452,12 @@ st.markdown('<div class="filter-row">', unsafe_allow_html=True)
 fc1, fc2, fc3, fc4, fc5 = st.columns(5)
 with fc1: sku_f = st.multiselect("SKU", opts.get("skus", []), key="g_sku")
 with fc2:
-    date_f = st.date_input("采购时间", value=(opts.get("date_min"), opts.get("date_max")),
-                           min_value=opts.get("date_min"), max_value=opts.get("date_max"),
-                           key="g_date") if "date_min" in opts else None
+    if "date_min" in opts:
+        date_f = st.date_input("采购时间", value=(opts.get("date_min"), opts.get("date_max")),
+                               min_value=opts.get("date_min"), max_value=opts.get("date_max"),
+                               key="g_date")
+    else:
+        date_f = st.date_input("采购时间", value=None, key="g_date")
 with fc3: wh_f = st.multiselect("库房", opts.get("warehouses", []), key="g_wh")
 with fc4: sup_f = st.multiselect("供应商", opts.get("suppliers", []), key="g_sup")
 with fc5: sts_f = st.multiselect("状态", opts.get("statuses", []), key="g_sts")
