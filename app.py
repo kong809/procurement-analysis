@@ -201,6 +201,7 @@ section[data-testid="stSidebar"] button[kind="secondary"]:hover {
 .info-sidebar {
     background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
     padding: 18px 16px; position: sticky; top: 80px;
+    max-height: calc(100vh - 100px); overflow-y: auto;
 }
 .info-sidebar-title {
     font-size: 14px; font-weight: 700; color: #1e40af;
