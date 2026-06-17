@@ -3,8 +3,17 @@ import plotly.graph_objects as go
 
 
 def bar_chart(df, x, y, title="", color=None, orientation="v"):
-    fig = px.bar(df, x=x, y=y, title=title, color=color, orientation=orientation)
-    fig.update_traces(texttemplate="%{y:.2f}", textposition="outside")
+    df = df.copy()
+    if x in df.columns and df[x].dtype == object:
+        df["_x_short"] = df[x].astype(str).str[:3] + "…"
+        df["_x_full"] = df[x].astype(str)
+        fig = px.bar(df, x="_x_short", y=y, title=title, color=color, orientation=orientation)
+        fig.update_traces(texttemplate="%{y:.2f}", textposition="outside",
+                          customdata=df[["_x_full"]].values,
+                          hovertemplate="%{customdata[0]}<br>%{y:.2f}<extra></extra>")
+    else:
+        fig = px.bar(df, x=x, y=y, title=title, color=color, orientation=orientation)
+        fig.update_traces(texttemplate="%{y:.2f}", textposition="outside")
     fig.update_layout(margin=dict(l=10, r=10, t=25, b=40), height=190, xaxis_tickangle=-30)
     return fig
 
