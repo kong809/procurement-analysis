@@ -197,17 +197,19 @@ section[data-testid="stSidebar"] button[kind="secondary"]:hover {
 /* ─ 上传区 ─ */
 [data-testid="stExpander"] [data-testid="stFileUploader"] { border: 2px dashed #d1d5db; border-radius: 8px; padding: 12px; }
 
+/* ─ 右侧栏容器 overflow 修复 ─ */
+.st-emotion-cache-1xarcny { overflow: visible !important; }
+.st-emotion-cache-1kyxreq { overflow: visible !important; }
+[data-testid="stColumn"] { overflow: visible !important; }
+
 /* ─ 右侧功能说明栏 ─ */
 .info-sidebar {
     background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
     padding: 18px 16px;
-    position: fixed;
-    right: 16px;
-    top: 80px;
-    width: calc(25% - 32px);
-    max-height: calc(100vh - 100px);
+    position: sticky;
+    top: 70px;
+    max-height: calc(100vh - 90px);
     overflow-y: auto;
-    z-index: 100;
 }
 .info-sidebar::-webkit-scrollbar { width: 4px; }
 .info-sidebar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
