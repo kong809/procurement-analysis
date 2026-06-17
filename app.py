@@ -469,7 +469,7 @@ with _main_col:
         summary_lines.append(f'<div class="info-sidebar-title">📋 分析摘要</div>')
         summary_lines.append(f'<div class="summary-row summary-highlight">✅ 已帮您分析 <b>{len(filtered):,}</b> 行数据</div>')
 
-        # 基础统计
+        # 1. 基础数据
         if not agg.empty:
             sku_count = len(agg)
             total_qty = agg['采购数量'].sum() if '采购数量' in agg.columns else 0
@@ -480,7 +480,23 @@ with _main_col:
             sup_count = len(sup_ov)
             summary_lines.append(f'<div class="summary-row"><span class="summary-icon">🏭</span> 涉及 <b>{sup_count:,}</b> 家供应商</div>')
 
-        # 履约率
+        # 2. 采购金额
+        if not ledger.empty:
+            amt_col = "SKU采购金额" if "SKU采购金额" in ledger.columns else "采购金额"
+            if amt_col in ledger.columns:
+                total_amt_ledger = ledger[amt_col].sum()
+                top_sku_amt = ledger.nlargest(1, amt_col)
+                top_sku_name = top_sku_amt["SKU"].iloc[0] if "SKU" in top_sku_amt.columns else ""
+                top_sku_val = top_sku_amt[amt_col].iloc[0]
+                summary_lines.append(f'<div class="summary-row"><span class="summary-icon">💰</span> 采购金额合计 <b>¥{total_amt_ledger:,.2f}</b>，最高金额SKU：<b>{top_sku_name}</b>（¥{top_sku_val:,.2f}）</div>')
+
+        # 3. 补货分析
+        if not rep.empty:
+            rep_count = len(rep)
+            rep_qty = rep['需采购量'].sum() if '需采购量' in rep.columns else 0
+            summary_lines.append(f'<div class="summary-row"><span class="summary-icon">🧮</span> 需补货 <b>{rep_count:,}</b> 个SKU，总补货量 <b>{rep_qty:,.0f}</b> 件</div>')
+
+        # 4. 履约数据
         if not fr.empty:
             total_fr = len(fr)
             full_n = len(fr[fr["履约类别"] == FULFILLMENT_FULL])
@@ -489,7 +505,6 @@ with _main_col:
             full_rate = full_n / total_fr * 100 if total_fr > 0 else 0
             summary_lines.append(f'<div class="summary-row"><span class="summary-icon">📊</span> 履约率：<b>{full_rate:.1f}%</b> 足额满足，部分满足 {part_n} 单，未履约 {none_n} 单</div>')
 
-        # 履约时效（重点）
         if not dt.empty:
             normal_n = len(dt[dt["履约时效状态"] == "正常履约"])
             minor_n = len(dt[dt["履约时效状态"] == "轻微逾期"])
@@ -498,6 +513,7 @@ with _main_col:
             overdue_n = minor_n + severe_n
             overdue_rate = overdue_n / total_dt * 100 if total_dt > 0 else 0
 
+            top_sup_names = ""
             if "供应商名称" in dt.columns and overdue_n > 0:
                 overdue_orders = dt[dt["履约时效状态"].isin(["轻微逾期", "严重逾期"])]
                 top_overdue_sup = overdue_orders.groupby("供应商名称").agg(逾期数=("采购单号", "nunique")).reset_index()
@@ -505,10 +521,10 @@ with _main_col:
                 top_sup_names = "、".join(top_overdue_sup["供应商名称"].tolist()[:3])
 
             summary_lines.append(f'<div class="summary-row summary-warn"><span class="summary-icon">⏱️</span> 履约时效：逾期率 <b>{overdue_rate:.1f}%</b>（轻微 {minor_n} / 严重 {severe_n}）</div>')
-            if overdue_n > 0 and "供应商名称" in dt.columns:
+            if overdue_n > 0 and top_sup_names:
                 summary_lines.append(f'<div class="summary-row summary-warn-detail">⚠️ 逾期集中供应商：{top_sup_names}</div>')
 
-        # 价格预警（重点）
+        # 5. 预警数据
         if not sku_alert.empty:
             level1 = len(sku_alert[sku_alert["超阈值程度"] == "一级预警"])
             level2 = len(sku_alert[sku_alert["超阈值程度"] == "二级预警"])
@@ -523,12 +539,6 @@ with _main_col:
                     top_alert = top_alert.sort_values("预警次数", ascending=False).head(3)
                     top_sku_names = "、".join(top_alert["SKU"].astype(str).tolist()[:3])
                     summary_lines.append(f'<div class="summary-row summary-warn-detail">🔴 高价差异SKU：{top_sku_names}</div>')
-
-        # 补货
-        if not rep.empty:
-            rep_count = len(rep)
-            rep_qty = rep['需采购量'].sum() if '需采购量' in rep.columns else 0
-            summary_lines.append(f'<div class="summary-row"><span class="summary-icon">🧮</span> 需补货 <b>{rep_count:,}</b> 个SKU，总补货量 <b>{rep_qty:,.0f}</b> 件</div>')
 
         summary_html = '<div class="info-sidebar">' + "\n".join(summary_lines) + '</div>'
 
