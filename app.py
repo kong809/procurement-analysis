@@ -396,6 +396,7 @@ with _main_col:
                 if fuzzy_n:
                     msg += f"，模糊匹配 {fuzzy_n} 列"
                 st.success(msg)
+                st.rerun()
 
     # ═══════════════════════════════════════════════════════════
     # 数据状态判断
