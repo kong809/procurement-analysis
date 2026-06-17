@@ -4,9 +4,11 @@ import plotly.graph_objects as go
 
 def bar_chart(df, x, y, title="", color=None, orientation="v"):
     df = df.copy()
-    if x in df.columns and df[x].dtype == object:
-        df["_x_short"] = df[x].astype(str).str[:3] + "…"
-        df["_x_full"] = df[x].astype(str)
+    x_vals = df[x].astype(str)
+    need_short = any(len(v) > 3 for v in x_vals)
+    if need_short:
+        df["_x_short"] = x_vals.str[:3] + "…"
+        df["_x_full"] = x_vals
         fig = px.bar(df, x="_x_short", y=y, title=title, color=color, orientation=orientation)
         fig.update_traces(texttemplate="%{y:.2f}", textposition="outside",
                           customdata=df[["_x_full"]].values,
@@ -19,9 +21,21 @@ def bar_chart(df, x, y, title="", color=None, orientation="v"):
 
 
 def pie_chart(df, values, names, title="", hole=0.4):
-    fig = px.pie(df, values=values, names=names, hole=hole)
-    fig.update_traces(textposition="inside", textinfo="label+percent",
-                      texttemplate="%{label}<br>%{percent:.1%}")
+    df = df.copy()
+    name_vals = df[names].astype(str)
+    need_short = any(len(v) > 3 for v in name_vals)
+    if need_short:
+        df["_name_short"] = name_vals.str[:3] + "…"
+        df["_name_full"] = name_vals
+        fig = px.pie(df, values=values, names="_name_short", hole=hole)
+        fig.update_traces(textposition="inside", textinfo="label+percent",
+                          texttemplate="%{label}<br>%{percent:.1%}",
+                          customdata=df[["_name_full"]].values,
+                          hovertemplate="%{customdata[0]}<br>%{percent:.1%}<extra></extra>")
+    else:
+        fig = px.pie(df, values=values, names=names, hole=hole)
+        fig.update_traces(textposition="inside", textinfo="label+percent",
+                          texttemplate="%{label}<br>%{percent:.1%}")
     fig.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=200, showlegend=False)
     return fig
 
