@@ -876,7 +876,7 @@ with _main_col:
                         fig_sup.update_traces(texttemplate="%{y}", textposition="outside",
                                               customdata=sup_overdue[["名称_全"]].values,
                                               hovertemplate="%{customdata[0]}<br>逾期数：%{y}<extra></extra>")
-                        fig_sup.update_layout(margin=dict(l=10, r=10, t=25, b=30), height=220, showlegend=False, plot_bgcolor="#fff", paper_bgcolor="#fff", xaxis_tickangle=-30)
+                        fig_sup.update_layout(margin=dict(l=10, r=10, t=25, b=30), height=220, showlegend=False, plot_bgcolor="#fff", paper_bgcolor="#fff", xaxis_tickangle=-30, xaxis_title="供应商名称")
                         st.plotly_chart(fig_sup, use_container_width=True)
             with bc2:
                 sku_data = filtered[["采购单号", "SKU", "SKU名称"]].drop_duplicates(subset=["采购单号"]) if "SKU" in filtered.columns else pd.DataFrame()
@@ -901,7 +901,7 @@ with _main_col:
                                 hovertemplate="%{customdata[0]}<br>逾期数：%{y}<extra></extra>",
                                 customdata=sku_overdue[["名称_全"]],
                             )
-                            fig_sku.update_layout(margin=dict(l=10, r=10, t=25, b=10), height=220, showlegend=False, plot_bgcolor="#fff", paper_bgcolor="#fff")
+                            fig_sku.update_layout(margin=dict(l=10, r=10, t=25, b=10), height=220, showlegend=False, plot_bgcolor="#fff", paper_bgcolor="#fff", xaxis_title="供应商名称")
                             st.plotly_chart(fig_sku, use_container_width=True)
     card_end()
 
