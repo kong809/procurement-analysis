@@ -89,6 +89,7 @@ html, body, [class*="stMarkdown"] { font-size: 13px; color: #1f2937; }
 
 /* ─ 标题层级 ─ */
 h1 { font-size: 1.4rem !important; font-weight: 700 !important; color: #111827 !important; margin-bottom: 0.4rem !important; }
+h2 { margin-bottom: 0 !important; }
 h3 { font-size: 0.95rem !important; font-weight: 600 !important; color: #374151 !important; margin-top: 0.3rem !important; margin-bottom: 0.2rem !important; }
 
 /* ─ 卡片容器 ─ */
@@ -114,7 +115,7 @@ h3 { font-size: 0.95rem !important; font-weight: 600 !important; color: #374151 
 /* ─ 区段标题 ─ */
 .section-header {
     font-size: 1.05rem; font-weight: 700; color: #1e40af;
-    padding: 6px 0; margin: 8px 0 4px 0;
+    padding: 4px 0; margin: 2px 0 0 0;
     border-left: 4px solid #3b82f6; padding-left: 10px;
     scroll-margin-top: 60px;
 }
