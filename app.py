@@ -198,14 +198,19 @@ section[data-testid="stSidebar"] button[kind="secondary"]:hover {
 [data-testid="stExpander"] [data-testid="stFileUploader"] { border: 2px dashed #d1d5db; border-radius: 8px; padding: 12px; }
 
 /* ─ 右侧功能说明栏 ─ */
-/* ─ 右侧浮动面板 ── */
-.info-sidebar-float {
-    position: fixed; right: 20px; top: 80px; width: 320px;
+.info-sidebar {
     background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
-    padding: 18px 16px; z-index: 100;
-    max-height: calc(100vh - 100px); overflow-y: auto;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    padding: 18px 16px;
+    position: fixed;
+    right: 16px;
+    top: 80px;
+    width: calc(25% - 32px);
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    z-index: 100;
 }
+.info-sidebar::-webkit-scrollbar { width: 4px; }
+.info-sidebar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 .info-sidebar-title {
     font-size: 14px; font-weight: 700; color: #1e40af;
     padding-bottom: 10px; margin-bottom: 10px;
@@ -313,626 +318,631 @@ with st.sidebar:
         st.session_state["guide_step"] = 0
         st.rerun()
 
-# ── 右侧功能说明栏（CSS浮动面板，不影响主内容渲染） ──
+# ── 右侧功能说明栏 ──
 has_data_pre = "merged_df" in st.session_state and not st.session_state["merged_df"].empty
+_main_col, _info_col = st.columns([3, 1])
 
-if not has_data_pre:
-    st.markdown("""
-    <div class="info-sidebar-float">
-        <div class="info-sidebar-title">📋 采购单明细数据AI智能分析</div>
-        <div class="info-sidebar-intro">您可以导入采销工作台导出的采购单明细表格，即可生成多维度数据分析内容。</div>
-        <div class="info-sidebar-section">
-            <div class="info-section-icon">📦</div>
-            <div class="info-section-body">
-                <div class="info-section-title">基础数据分析</div>
-                <div class="info-section-desc">支持剔除单据维度，按 SKU、供应商双维度，对指定周期内采购数量、实收数量、采购金额、采购单价等指标开展统计分析。</div>
+with _info_col:
+    if not has_data_pre:
+        st.markdown("""
+        <div class="info-sidebar">
+            <div class="info-sidebar-title">📋 采购单明细数据AI智能分析</div>
+            <div class="info-sidebar-intro">您可以导入采销工作台导出的采购单明细表格，即可生成多维度数据分析内容。</div>
+            <div class="info-sidebar-section">
+                <div class="info-section-icon">📦</div>
+                <div class="info-section-body">
+                    <div class="info-section-title">基础数据分析</div>
+                    <div class="info-section-desc">支持剔除单据维度，按 SKU、供应商双维度，对指定周期内采购数量、实收数量、采购金额、采购单价等指标开展统计分析。</div>
+                </div>
+            </div>
+            <div class="info-sidebar-section">
+                <div class="info-section-icon">💰</div>
+                <div class="info-section-body">
+                    <div class="info-section-title">采购金额数据分析</div>
+                    <div class="info-section-desc">围绕采购金额，提供 SKU、供应商维度精细化分析视图；可查看单供应商下各 SKU 采购金额分布，针对一品多商业务场景，支持查看同一 SKU 在不同供应商侧的供货分布、采购单价及采购金额占比。</div>
+                </div>
+            </div>
+            <div class="info-sidebar-section">
+                <div class="info-section-icon">🧮</div>
+                <div class="info-section-body">
+                    <div class="info-section-title">补货数据分析</div>
+                    <div class="info-section-desc">面向手动补货需求用户，通过补货模块测算所需补货量；支持一键点击「采购需求提报」完成补货操作，快速生成对应采购单，实现快捷补货。</div>
+                </div>
+            </div>
+            <div class="info-sidebar-section">
+                <div class="info-section-icon">✅</div>
+                <div class="info-section-body">
+                    <div class="info-section-title">采购履约数据分析</div>
+                    <div class="info-section-desc">从采购单履约率、履约时效两大维度进行数据查看；支持自定义调整履约周期，直观展示采购单正常时效、轻微逾期、严重逾期三类单据区间及对应占比。</div>
+                </div>
+            </div>
+            <div class="info-sidebar-section">
+                <div class="info-section-icon">⚠️</div>
+                <div class="info-section-body">
+                    <div class="info-section-title">采购预警数据分析</div>
+                    <div class="info-section-desc">系统针对同一 SKU 多供应商价差异常自动触发预警：同 SKU 采购价高出最低价 8%-15% 触发二级预警；高出最低价 15% 及以上触发一级预警。</div>
+                </div>
             </div>
         </div>
-        <div class="info-sidebar-section">
-            <div class="info-section-icon">💰</div>
-            <div class="info-section-body">
-                <div class="info-section-title">采购金额数据分析</div>
-                <div class="info-section-desc">围绕采购金额，提供 SKU、供应商维度精细化分析视图；可查看单供应商下各 SKU 采购金额分布，针对一品多商业务场景，支持查看同一 SKU 在不同供应商侧的供货分布、采购单价及采购金额占比。</div>
-            </div>
-        </div>
-        <div class="info-sidebar-section">
-            <div class="info-section-icon">🧮</div>
-            <div class="info-section-body">
-                <div class="info-section-title">补货数据分析</div>
-                <div class="info-section-desc">面向手动补货需求用户，通过补货模块测算所需补货量；支持一键点击「采购需求提报」完成补货操作，快速生成对应采购单，实现快捷补货。</div>
-            </div>
-        </div>
-        <div class="info-sidebar-section">
-            <div class="info-section-icon">✅</div>
-            <div class="info-section-body">
-                <div class="info-section-title">采购履约数据分析</div>
-                <div class="info-section-desc">从采购单履约率、履约时效两大维度进行数据查看；支持自定义调整履约周期，直观展示采购单正常时效、轻微逾期、严重逾期三类单据区间及对应占比。</div>
-            </div>
-        </div>
-        <div class="info-sidebar-section">
-            <div class="info-section-icon">⚠️</div>
-            <div class="info-section-body">
-                <div class="info-section-title">采购预警数据分析</div>
-                <div class="info-section-desc">系统针对同一 SKU 多供应商价差异常自动触发预警：同 SKU 采购价高出最低价 8%-15% 触发二级预警；高出最低价 15% 及以上触发一级预警。</div>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-# ═══════════════════════════════════════════════════════════
-# 数据上传区 —— 始终可见，新上传覆盖旧数据
-# ═══════════════════════════════════════════════════════════
-with st.expander("📤 数据上传", expanded=("merged_df" not in st.session_state)):
-    uploaded_files = st.file_uploader(
-        "上传采购单 Excel 文件（支持 .xls / .xlsx，可多文件）",
-        type=["xls", "xlsx"],
-        accept_multiple_files=True,
-        key="_file_uploader",
-    )
-
-    if uploaded_files:
-        with st.spinner("解析中..."):
-            sheets = read_excel_files(uploaded_files)
-
-        if sheets:
-            raw_columns = list(dict.fromkeys(c for df in sheets.values() for c in df.columns))
-            match_result = match_headers(raw_columns)
-
-            fuzzy_overrides = dict(match_result["fuzzy"]) if match_result["fuzzy"] else {}
-
-            final_mapping = apply_mapping(raw_columns, match_result["auto"], fuzzy_overrides)
-            merged = merge_dataframes(sheets, column_mapping=final_mapping)
-            merged = clean_dataframe(merged)
-
-            st.session_state["merged_df"] = merged
-            for key in list(st.session_state.keys()):
-                if key.startswith("_calc_"):
-                    del st.session_state[key]
-
-            auto_n = len([k for k, v in match_result["auto"].items() if v != k])
-            fuzzy_n = len(match_result["fuzzy"])
-            msg = f"数据就绪：{len(merged):,} 行 × {len(merged.columns)} 列 | 自动匹配 {auto_n} 列"
-            if fuzzy_n:
-                msg += f"，模糊匹配 {fuzzy_n} 列"
-            st.success(msg)
-            st.rerun()
-
-# ═══════════════════════════════════════════════════════════
-# 数据状态判断
-# ═══════════════════════════════════════════════════════════
-has_data = "merged_df" in st.session_state and not st.session_state["merged_df"].empty
-
-if has_data:
-    df = st.session_state["merged_df"]
-    st.caption(f"当前数据：{len(df):,} 行 × {len(df.columns)} 列")
-else:
-    df = pd.DataFrame()
-    st.caption("当前数据：未上传")
-
-section_header("基础数据分析", "sec-basic")
-
-# ═══════════════════════════════════════════════════════════
-# 筛选条件（紧凑一行）
-# ═══════════════════════════════════════════════════════════
-if has_data:
-    opts = get_filter_options(df)
-else:
-    opts = {}
-st.markdown('<div class="filter-row">', unsafe_allow_html=True)
-fc1, fc2, fc3, fc4, fc5 = st.columns(5)
-with fc1: sku_f = st.multiselect("SKU", opts.get("skus", []), key="g_sku")
-with fc2:
-    if "date_min" in opts:
-        date_f = st.date_input("采购时间", value=(opts.get("date_min"), opts.get("date_max")),
-                               min_value=opts.get("date_min"), max_value=opts.get("date_max"),
-                               key="g_date")
+        """, unsafe_allow_html=True)
     else:
-        date_f = st.date_input("采购时间", value=None, key="g_date")
-with fc3: wh_f = st.multiselect("库房", opts.get("warehouses", []), key="g_wh")
-with fc4: sup_f = st.multiselect("供应商", opts.get("suppliers", []), key="g_sup")
-with fc5: sts_f = st.multiselect("状态", opts.get("statuses", []), key="g_sts")
-st.markdown('</div>', unsafe_allow_html=True)
+        _info_placeholder = st.empty()
 
-if has_data:
-    dr = date_f if date_f and len(date_f) == 2 else None
-    filtered = apply_filters(df, skus=sku_f or None, date_range=dr,
-                             warehouses=wh_f or None, suppliers=sup_f or None, statuses=sts_f or None)
-else:
-    filtered = pd.DataFrame()
+with _main_col:
+    # ═══════════════════════════════════════════════════════════
+    # 数据上传区 —— 始终可见，新上传覆盖旧数据
+    # ═══════════════════════════════════════════════════════════
+    with st.expander("📤 数据上传", expanded=("merged_df" not in st.session_state)):
+        uploaded_files = st.file_uploader(
+            "上传采购单 Excel 文件（支持 .xls / .xlsx，可多文件）",
+            type=["xls", "xlsx"],
+            accept_multiple_files=True,
+            key="_file_uploader",
+        )
 
-# 预计算所有分析结果（筛选变化时自动重算）
-if has_data:
-    agg = sku_aggregate(filtered)
-    ledger = sku_ledger(filtered)
-    sup_ov = supplier_overview(filtered)
-    fr = fulfillment_rate(filtered)
-    rep_cycle_val = st.session_state.get("rep_cycle", 7)
-    safety_map = dict(zip(st.session_state.get("safety_stock_df", pd.DataFrame(columns=["SKU", "安全库存"]))["SKU"],
-                           st.session_state.get("safety_stock_df", pd.DataFrame(columns=["SKU", "安全库存"]))["安全库存"]))
-    rep = calculate_replenishment(filtered, rep_cycle_val, safety_stock=safety_map)
-    sku_alert = sku_price_alert_list(filtered, 5.0)
-    dt_cycle_val = st.session_state.get("dt_cycle", DEFAULT_DELIVERY_CYCLE_DAYS)
-    dt = delivery_timeliness(filtered, dt_cycle_val)
-else:
-    agg = pd.DataFrame()
-    ledger = pd.DataFrame()
-    sup_ov = pd.DataFrame()
-    fr = pd.DataFrame()
-    rep = pd.DataFrame()
-    sku_alert = pd.DataFrame()
-    dt = pd.DataFrame()
+        if uploaded_files:
+            with st.spinner("解析中..."):
+                sheets = read_excel_files(uploaded_files)
 
-# ── 填充右侧栏数据摘要（有数据时） ──
-if has_data_pre:
-    summary_lines = []
-    summary_lines.append(f'<div class="info-sidebar-title">📋 分析摘要</div>')
-    summary_lines.append(f'<div class="summary-row summary-highlight">✅ 已帮您分析 <b>{len(filtered):,}</b> 行数据</div>')
+            if sheets:
+                raw_columns = list(dict.fromkeys(c for df in sheets.values() for c in df.columns))
+                match_result = match_headers(raw_columns)
 
-    # 1. 基础数据
-    if not agg.empty:
-        sku_count = len(agg)
-        total_qty = agg['采购数量'].sum() if '采购数量' in agg.columns else 0
-        total_amt = agg['SKU采购金额'].sum() if 'SKU采购金额' in agg.columns else 0
-        summary_lines.append(f'<div class="summary-row"><span class="summary-icon">📦</span> 共 <b>{sku_count:,}</b> 个SKU，采购量 <b>{total_qty:,.0f}</b> 件，采购额 <b>¥{total_amt:,.2f}</b></div>')
+                fuzzy_overrides = dict(match_result["fuzzy"]) if match_result["fuzzy"] else {}
 
-    if not sup_ov.empty:
-        sup_count = len(sup_ov)
-        summary_lines.append(f'<div class="summary-row"><span class="summary-icon">🏭</span> 涉及 <b>{sup_count:,}</b> 家供应商</div>')
+                final_mapping = apply_mapping(raw_columns, match_result["auto"], fuzzy_overrides)
+                merged = merge_dataframes(sheets, column_mapping=final_mapping)
+                merged = clean_dataframe(merged)
 
-    # 2. 采购金额
-    if not ledger.empty:
-        amt_col = "SKU采购金额" if "SKU采购金额" in ledger.columns else "采购金额"
-        if amt_col in ledger.columns:
-            total_amt_ledger = ledger[amt_col].sum()
-            top_sku_amt = ledger.nlargest(1, amt_col)
-            top_sku_name = top_sku_amt["SKU"].iloc[0] if "SKU" in top_sku_amt.columns else ""
-            top_sku_val = top_sku_amt[amt_col].iloc[0]
-            summary_lines.append(f'<div class="summary-row"><span class="summary-icon">💰</span> 采购金额合计 <b>¥{total_amt_ledger:,.2f}</b>，最高金额SKU：<b>{top_sku_name}</b>（¥{top_sku_val:,.2f}）</div>')
+                st.session_state["merged_df"] = merged
+                for key in list(st.session_state.keys()):
+                    if key.startswith("_calc_"):
+                        del st.session_state[key]
 
-    # 3. 补货分析
-    if not rep.empty:
-        rep_count = len(rep)
-        rep_qty = rep['需采购量'].sum() if '需采购量' in rep.columns else 0
-        summary_lines.append(f'<div class="summary-row"><span class="summary-icon">🧮</span> 需补货 <b>{rep_count:,}</b> 个SKU，总补货量 <b>{rep_qty:,.0f}</b> 件</div>')
+                auto_n = len([k for k, v in match_result["auto"].items() if v != k])
+                fuzzy_n = len(match_result["fuzzy"])
+                msg = f"数据就绪：{len(merged):,} 行 × {len(merged.columns)} 列 | 自动匹配 {auto_n} 列"
+                if fuzzy_n:
+                    msg += f"，模糊匹配 {fuzzy_n} 列"
+                st.success(msg)
+                st.rerun()
 
-    # 4. 履约数据
-    if not fr.empty:
-        total_fr = len(fr)
-        full_n = len(fr[fr["履约类别"] == FULFILLMENT_FULL])
-        part_n = len(fr[fr["履约类别"] == FULFILLMENT_PARTIAL])
-        none_n = len(fr[fr["履约类别"] == FULFILLMENT_NONE])
-        full_rate = full_n / total_fr * 100 if total_fr > 0 else 0
-        summary_lines.append(f'<div class="summary-row"><span class="summary-icon">📊</span> 履约率：<b>{full_rate:.1f}%</b> 足额满足，部分满足 {part_n} 单，未履约 {none_n} 单</div>')
+    # ═══════════════════════════════════════════════════════════
+    # 数据状态判断
+    # ═══════════════════════════════════════════════════════════
+    has_data = "merged_df" in st.session_state and not st.session_state["merged_df"].empty
 
-    if not dt.empty:
-        normal_n = len(dt[dt["履约时效状态"] == "正常履约"])
-        minor_n = len(dt[dt["履约时效状态"] == "轻微逾期"])
-        severe_n = len(dt[dt["履约时效状态"] == "严重逾期"])
-        total_dt = len(dt)
-        overdue_n = minor_n + severe_n
-        overdue_rate = overdue_n / total_dt * 100 if total_dt > 0 else 0
-
-        top_sup_names = ""
-        if "供应商名称" in dt.columns and overdue_n > 0:
-            overdue_orders = dt[dt["履约时效状态"].isin(["轻微逾期", "严重逾期"])]
-            top_overdue_sup = overdue_orders.groupby("供应商名称").agg(逾期数=("采购单号", "nunique")).reset_index()
-            top_overdue_sup = top_overdue_sup.sort_values("逾期数", ascending=False).head(3)
-            top_sup_names = "、".join(top_overdue_sup["供应商名称"].tolist()[:3])
-
-        summary_lines.append(f'<div class="summary-row summary-warn"><span class="summary-icon">⏱️</span> 履约时效：逾期率 <b>{overdue_rate:.1f}%</b>（轻微 {minor_n} / 严重 {severe_n}）</div>')
-        if overdue_n > 0 and top_sup_names:
-            summary_lines.append(f'<div class="summary-row summary-warn-detail">⚠️ 逾期集中供应商：{top_sup_names}</div>')
-
-    # 5. 预警数据
-    if not sku_alert.empty:
-        level1 = len(sku_alert[sku_alert["超阈值程度"] == "一级预警"])
-        level2 = len(sku_alert[sku_alert["超阈值程度"] == "二级预警"])
-        level3 = len(sku_alert[sku_alert["超阈值程度"] == "三级预警"])
-        total_alert = level1 + level2 + level3
-        summary_lines.append(f'<div class="summary-row summary-warn"><span class="summary-icon">🚨</span> 价格预警：<b>{total_alert}</b> 条异常（一级 {level1} / 二级 {level2} / 三级 {level3}）</div>')
-
-        if "SKU" in sku_alert.columns and total_alert > 0:
-            alert_skus = sku_alert[sku_alert["超阈值程度"].isin(["一级预警", "二级预警"])]
-            if not alert_skus.empty:
-                top_alert = alert_skus.groupby("SKU").size().reset_index(name="预警次数")
-                top_alert = top_alert.sort_values("预警次数", ascending=False).head(3)
-                top_sku_names = "、".join(top_alert["SKU"].astype(str).tolist()[:3])
-                summary_lines.append(f'<div class="summary-row summary-warn-detail">🔴 高价差异SKU：{top_sku_names}</div>')
-
-    summary_html = '<div class="info-sidebar-float">' + "\n".join(summary_lines) + '</div>'
-
-    # 逐行动画：用 JS 逐行淡入
-    animated_lines = []
-    for i, line in enumerate(summary_lines):
-        delay = i * 0.35
-        animated_lines.append(f'<div class="summary-line-anim" style="animation-delay:{delay}s">{line}</div>')
-    animated_html = '<div class="info-sidebar-float">' + "\n".join(animated_lines) + '</div>'
-
-    st.markdown(animated_html, unsafe_allow_html=True)
-
-# ═══════════════════════════════════════════════════════════
-# 第一行：SKU汇总 | 供应商总览
-# ═══════════════════════════════════════════════════════════
-row1_l, row1_r = st.columns(2)
-
-with row1_l:
-    card("📦", "SKU 汇总")
-    if not agg.empty:
-        c1, c2, c3 = st.columns(3)
-        c1.metric("SKU总数(个)", f"{len(agg):,}")
-        c2.metric("总采购量(件)", f"{agg['采购数量'].sum():,.0f}" if "采购数量" in agg.columns else "-")
-        c3.metric("总采购额(元)", f"{agg['SKU采购金额'].sum():,.2f}" if "SKU采购金额" in agg.columns else "-")
-        st.dataframe(agg, use_container_width=True, hide_index=True, height=130)
-        download_excel(agg, "SKU汇总.xlsx")
-    else:
-        c1, c2, c3 = st.columns(3)
-        c1.metric("SKU总数(个)", "-")
-        c2.metric("总采购量(件)", "-")
-        c3.metric("总采购额(元)", "-")
-        st.info("请上传数据")
-    card_end()
-
-with row1_r:
-    card("🏭", "供应商总览")
-    if not sup_ov.empty:
-        c1, c2, c3 = st.columns(3)
-        c1.metric("供应商总数(个)", f"{len(sup_ov):,}")
-        c2.metric("总采购额(元)", f"{sup_ov['累计采购金额'].sum():,.2f}" if "累计采购金额" in sup_ov.columns else "-")
-        c3.metric("SKU数(个)", f"{sup_ov['合作SKU数'].sum():,}" if "合作SKU数" in sup_ov.columns else "-")
-        st.dataframe(sup_ov, use_container_width=True, hide_index=True, height=130)
-        download_excel(sup_ov, "供应商总览.xlsx")
-    else:
-        c1, c2, c3 = st.columns(3)
-        c1.metric("供应商总数(个)", "-")
-        c2.metric("总采购额(元)", "-")
-        c3.metric("SKU数(个)", "-")
-        st.info("请上传数据")
-    card_end()
-
-section_header("采购金额数据分析", "sec-amount")
-
-# ═══════════════════════════════════════════════════════════
-# SKU台账（全宽）
-# ═══════════════════════════════════════════════════════════
-card("📋", "SKU 台账")
-if not ledger.empty:
-    st.dataframe(ledger, use_container_width=True, hide_index=True, height=130)
-    download_excel(ledger, "SKU台账.xlsx")
-else:
-    st.info("请上传数据")
-card_end()
-
-# ═══════════════════════════════════════════════════════════
-# 供应商维度 | 单品维度（两等分）
-# ═══════════════════════════════════════════════════════════
-row3_l, row3_r = st.columns(2)
-
-with row3_l:
-    card("🔍", "供应商维度")
-    if not sup_ov.empty:
-        sel_sup = st.selectbox("供应商", sup_ov["供应商名称"].tolist(), key="sup_detail")
-        sup_detail = supplier_sku_detail(filtered, sel_sup)
-        if not sup_detail.empty:
-            st.dataframe(sup_detail, use_container_width=True, hide_index=True, height=130)
-            download_excel(sup_detail, f"{sel_sup}_SKU明细.xlsx")
-            pc1, pc2 = st.columns(2)
-            with pc1:
-                if "采购金额" in sup_detail.columns:
-                    st.caption(f"{sel_sup} SKU金额占比")
-                    st.plotly_chart(pie_chart(sup_detail, "采购金额", "SKU"), use_container_width=True)
-            with pc2:
-                if "采购数量" in sup_detail.columns:
-                    st.caption(f"{sel_sup} SKU采购量占比")
-                    st.plotly_chart(pie_chart(sup_detail, "采购数量", "SKU"), use_container_width=True)
-        else:
-            st.info("该供应商暂无SKU明细")
-    else:
-        st.info("请上传数据")
-    card_end()
-
-with row3_r:
-    card("⚖️", "单品维度")
-    if "SKU" in filtered.columns and not filtered.empty:
-        sku_list = ledger["SKU"].tolist() if not ledger.empty and "SKU" in ledger.columns else sorted(filtered["SKU"].unique())
-        sel_sku = st.selectbox("SKU", sku_list, index=0, key="sup_cross")
-        comp = supplier_cross_comparison(filtered, sel_sku)
-        if not comp.empty:
-            st.dataframe(comp, use_container_width=True, hide_index=True, height=130)
-            download_excel(comp, f"{sel_sku}_供应商对比.xlsx")
-            cc1, cc2 = st.columns(2)
-            with cc1:
-                if "采购金额" in comp.columns:
-                    st.caption(f"{sel_sku} 供应商金额占比")
-                    st.plotly_chart(pie_chart(comp, "采购金额", "供应商名称"), use_container_width=True)
-            with cc2:
-                if "平均单价" in comp.columns:
-                    st.caption(f"{sel_sku} 供应商平均单价")
-                    st.plotly_chart(bar_chart(comp, "供应商名称", "平均单价"), use_container_width=True)
-    else:
-        st.info("请上传数据")
-    card_end()
-
-section_header("补货数据分析", "sec-replenish")
-
-card("🧮", "补货计算")
-if has_data:
-    rc1, rc2, rc3 = st.columns(3)
-    with rc1: rep_cycle = st.number_input("周期(天)", 1, 90, 7, key="rep_cycle")
-    with rc2:
-        if "配送中心" in filtered.columns:
-            rep_addr = st.multiselect("配送中心", sorted(filtered["配送中心"].dropna().unique()), key="rep_addr")
-        elif "送货地址" in filtered.columns:
-            rep_addr = st.multiselect("发货地", sorted(filtered["送货地址"].dropna().unique()), key="rep_addr")
-        else:
-            rep_addr = None
-    with rc3:
-        if "SKU" in filtered.columns:
-            rep_sku = st.multiselect("SKU", sorted(filtered["SKU"].dropna().unique()), key="rep_sku")
-        else:
-            rep_sku = None
-
-    if "SKU" in filtered.columns:
-        all_skus = sorted(filtered["SKU"].dropna().unique())
-        if "safety_stock_df" not in st.session_state:
-            st.session_state["safety_stock_df"] = pd.DataFrame({"SKU": all_skus, "安全库存": [20] * len(all_skus)})
-        safety_df = st.session_state["safety_stock_df"]
-        new_skus = [s for s in all_skus if s not in safety_df["SKU"].values]
-        if new_skus:
-            safety_df = pd.concat([safety_df, pd.DataFrame({"SKU": new_skus, "安全库存": [20] * len(new_skus)})], ignore_index=True)
-            st.session_state["safety_stock_df"] = safety_df
-
-        sku_name_map = {}
-        sku_dc_map = {}
-        if "SKU名称" in filtered.columns:
-            sku_name_map = filtered.dropna(subset=["SKU名称"]).groupby("SKU")["SKU名称"].first().to_dict()
-        if "配送中心" in filtered.columns:
-            sku_dc_map = filtered.dropna(subset=["配送中心"]).groupby("SKU")["配送中心"].first().to_dict()
-        display_df = safety_df.copy()
-        display_df["SKU名称"] = display_df["SKU"].map(sku_name_map)
-        display_df["配送中心"] = display_df["SKU"].map(sku_dc_map)
-        col_order = [c for c in ["SKU", "SKU名称", "配送中心", "安全库存"] if c in display_df.columns]
-        display_df = display_df[col_order]
-
-        safety_map = dict(zip(safety_df["SKU"], safety_df["安全库存"]))
-
-        with st.expander("⚙️ 安全库存配置（按SKU）", expanded=False):
-            edited_safety = st.data_editor(
-                display_df, use_container_width=True, hide_index=True,
-                column_config={"安全库存": st.column_config.NumberColumn(min_value=0, step=1, default=20)},
-                disabled=list(set(display_df.columns) - {"安全库存"}),
-                key="safety_editor",
-            )
-            safety_df["安全库存"] = edited_safety["安全库存"].values
-            st.session_state["safety_stock_df"] = safety_df
-            safety_map = dict(zip(safety_df["SKU"], safety_df["安全库存"]))
-    else:
-        safety_map = {}
-
-    if rep.empty:
-        st.success("所有SKU库存充足，无需补货")
-    else:
-        rep_filtered = rep.copy()
-        addr_col = "配送中心" if "配送中心" in rep_filtered.columns else "送货地址"
-        if rep_addr and addr_col in rep_filtered.columns:
-            rep_filtered = rep_filtered[rep_filtered[addr_col].isin(rep_addr)]
-        if rep_sku and "SKU" in rep_filtered.columns:
-            rep_filtered = rep_filtered[rep_filtered["SKU"].isin(rep_sku)]
-        if rep_filtered.empty:
-            st.success("所选范围内无需补货")
-        else:
-            c1, c2 = st.columns(2)
-            c1.metric("需补货SKU数", f"{len(rep_filtered):,}")
-            c2.metric("总需补货量", f"{rep_filtered['需采购量'].sum():,.0f}")
-            st.dataframe(rep_filtered, use_container_width=True, hide_index=True, height=130)
-            dl1, dl2 = st.columns([1, 1])
-            with dl1:
-                download_excel(rep_filtered, "补货计算.xlsx")
-            with dl2:
-                if st.button("采购需求提报"):
-                    st.session_state["_trigger_req_modal"] = True
-                    st.rerun()
-else:
-    st.info("请上传数据")
-card_end()
-
-if has_data and st.session_state.pop("_trigger_req_modal", False) and not rep.empty:
-    addr_col = "配送中心" if "配送中心" in rep.columns else "送货地址"
-    modal_data = rep.copy()
-    if rep_addr and addr_col in modal_data.columns:
-        modal_data = modal_data[modal_data[addr_col].isin(rep_addr)]
-    if rep_sku and "SKU" in modal_data.columns:
-        modal_data = modal_data[modal_data["SKU"].isin(rep_sku)]
-    req_modal(modal_data)
-
-section_header("采购履约数据分析", "sec-fulfillment")
-
-# ═══════════════════════════════════════════════════════════
-# 履约率（全宽）
-# ═══════════════════════════════════════════════════════════
-card("✅", "履约率")
-if not fr.empty:
-    fr_display = fr.copy()
-    c1, c2, c3, c4 = st.columns(4)
-    total = len(fr_display)
-    full_n = len(fr_display[fr_display["履约类别"] == FULFILLMENT_FULL])
-    part_n = len(fr_display[fr_display["履约类别"] == FULFILLMENT_PARTIAL])
-    none_n = len(fr_display[fr_display["履约类别"] == FULFILLMENT_NONE])
-    c1.metric("总采购单量", f"{total:,}")
-    c2.metric("足额满足", f"{full_n:,} ({full_n/total*100:.1f}%)" if total > 0 else "-")
-    c3.metric("部分满足", f"{part_n:,} ({part_n/total*100:.1f}%)" if total > 0 else "-")
-    c4.metric("未履约", f"{none_n:,} ({none_n/total*100:.1f}%)" if total > 0 else "-")
-
-    fc_a, fc_b, fc_c = st.columns(3)
-    with fc_a:
-        fr_dim = st.selectbox("筛选维度", ["SKU", "供应商", "库房"], key="fr_dim")
-    dim_col_map = {"SKU": "SKU", "供应商": "供应商名称", "库房": "库房"}
-    fr_dim_col = dim_col_map.get(fr_dim, "SKU")
-    with fc_b:
-        if fr_dim_col in fr.columns:
-            fr_dim_val = st.multiselect(f"选择{fr_dim}", sorted(fr[fr_dim_col].dropna().unique()), key="fr_dim_val")
-        else:
-            fr_dim_val = []
-    with fc_c:
-        fr_cat = st.selectbox("履约类别", ["全部", "足额满足", "部分满足", "未履约"], key="fr_cat")
-
-    if fr_dim_val and fr_dim_col in fr_display.columns:
-        fr_display = fr_display[fr_display[fr_dim_col].isin(fr_dim_val)]
-    cat_map = {"足额满足": FULFILLMENT_FULL, "部分满足": FULFILLMENT_PARTIAL, "未履约": FULFILLMENT_NONE}
-    if fr_cat != "全部" and fr_cat in cat_map:
-        fr_display = fr_display[fr_display["履约类别"] == cat_map[fr_cat]]
-    cols = [c for c in ["采购单号", "SKU", "SKU名称", "供应商名称", "库房",
-                        "原始采购数量", "实收数量", "到货完成率", "短缺数量", "短缺金额",
-                        "履约类别"] if c in fr_display.columns]
-    st.dataframe(fr_display[cols] if cols else fr_display, use_container_width=True, hide_index=True, height=130)
-    download_excel(fr_display, "履约率.xlsx")
-
-    pc1, pc2, pc3 = st.columns(3)
-    with pc1:
-        if "SKU" in fr.columns:
-            sku_cat = fr.groupby("履约类别")["SKU"].nunique().reset_index()
-            sku_cat.columns = ["履约类别", "SKU数"]
-            st.caption("按SKU维度履约分布")
-            st.plotly_chart(pie_chart(sku_cat, "SKU数", "履约类别"), use_container_width=True)
-    with pc2:
-        if "供应商名称" in fr.columns:
-            sup_cat = fr.groupby("履约类别")["供应商名称"].nunique().reset_index()
-            sup_cat.columns = ["履约类别", "供应商数"]
-            st.caption("按供应商维度履约分布")
-            st.plotly_chart(pie_chart(sup_cat, "供应商数", "履约类别"), use_container_width=True)
-    with pc3:
-        if "库房" in fr.columns:
-            wh_cat = fr.groupby("履约类别")["库房"].nunique().reset_index()
-            wh_cat.columns = ["履约类别", "库房数"]
-            st.caption("按库房维度履约分布")
-            st.plotly_chart(pie_chart(wh_cat, "库房数", "履约类别"), use_container_width=True)
-else:
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("总采购单量", "-")
-    c2.metric("足额满足", "-")
-    c3.metric("部分满足", "-")
-    c4.metric("未履约", "-")
-    st.info("请上传数据")
-card_end()
-
-# ═══════════════════════════════════════════════════════════
-# 履约时效（全宽）
-# ═══════════════════════════════════════════════════════════
-card("⏱️", "履约时效")
-if "dt_cycle" not in st.session_state:
-    st.session_state["dt_cycle"] = DEFAULT_DELIVERY_CYCLE_DAYS
-dt_cycle = st.number_input("周期(天)", 1, 60, DEFAULT_DELIVERY_CYCLE_DAYS, key="dt_cycle")
-if has_data:
-    dt_result = delivery_timeliness(filtered, dt_cycle)
-else:
-    dt_result = pd.DataFrame()
-if dt_result.empty:
     if has_data:
-        st.info("无采购时间数据")
+        df = st.session_state["merged_df"]
+        st.caption(f"当前数据：{len(df):,} 行 × {len(df.columns)} 列")
+    else:
+        df = pd.DataFrame()
+        st.caption("当前数据：未上传")
+
+    section_header("基础数据分析", "sec-basic")
+
+    # ═══════════════════════════════════════════════════════════
+    # 筛选条件（紧凑一行）
+    # ═══════════════════════════════════════════════════════════
+    if has_data:
+        opts = get_filter_options(df)
+    else:
+        opts = {}
+    st.markdown('<div class="filter-row">', unsafe_allow_html=True)
+    fc1, fc2, fc3, fc4, fc5 = st.columns(5)
+    with fc1: sku_f = st.multiselect("SKU", opts.get("skus", []), key="g_sku")
+    with fc2:
+        if "date_min" in opts:
+            date_f = st.date_input("采购时间", value=(opts.get("date_min"), opts.get("date_max")),
+                                   min_value=opts.get("date_min"), max_value=opts.get("date_max"),
+                                   key="g_date")
+        else:
+            date_f = st.date_input("采购时间", value=None, key="g_date")
+    with fc3: wh_f = st.multiselect("库房", opts.get("warehouses", []), key="g_wh")
+    with fc4: sup_f = st.multiselect("供应商", opts.get("suppliers", []), key="g_sup")
+    with fc5: sts_f = st.multiselect("状态", opts.get("statuses", []), key="g_sts")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    if has_data:
+        dr = date_f if date_f and len(date_f) == 2 else None
+        filtered = apply_filters(df, skus=sku_f or None, date_range=dr,
+                                 warehouses=wh_f or None, suppliers=sup_f or None, statuses=sts_f or None)
+    else:
+        filtered = pd.DataFrame()
+
+    # 预计算所有分析结果（筛选变化时自动重算）
+    if has_data:
+        agg = sku_aggregate(filtered)
+        ledger = sku_ledger(filtered)
+        sup_ov = supplier_overview(filtered)
+        fr = fulfillment_rate(filtered)
+        rep_cycle_val = st.session_state.get("rep_cycle", 7)
+        safety_map = dict(zip(st.session_state.get("safety_stock_df", pd.DataFrame(columns=["SKU", "安全库存"]))["SKU"],
+                               st.session_state.get("safety_stock_df", pd.DataFrame(columns=["SKU", "安全库存"]))["安全库存"]))
+        rep = calculate_replenishment(filtered, rep_cycle_val, safety_stock=safety_map)
+        sku_alert = sku_price_alert_list(filtered, 5.0)
+        dt_cycle_val = st.session_state.get("dt_cycle", DEFAULT_DELIVERY_CYCLE_DAYS)
+        dt = delivery_timeliness(filtered, dt_cycle_val)
+    else:
+        agg = pd.DataFrame()
+        ledger = pd.DataFrame()
+        sup_ov = pd.DataFrame()
+        fr = pd.DataFrame()
+        rep = pd.DataFrame()
+        sku_alert = pd.DataFrame()
+        dt = pd.DataFrame()
+
+    # ── 填充右侧栏数据摘要（有数据时） ──
+    if has_data_pre:
+        summary_lines = []
+        summary_lines.append(f'<div class="info-sidebar-title">📋 分析摘要</div>')
+        summary_lines.append(f'<div class="summary-row summary-highlight">✅ 已帮您分析 <b>{len(filtered):,}</b> 行数据</div>')
+
+        # 1. 基础数据
+        if not agg.empty:
+            sku_count = len(agg)
+            total_qty = agg['采购数量'].sum() if '采购数量' in agg.columns else 0
+            total_amt = agg['SKU采购金额'].sum() if 'SKU采购金额' in agg.columns else 0
+            summary_lines.append(f'<div class="summary-row"><span class="summary-icon">📦</span> 共 <b>{sku_count:,}</b> 个SKU，采购量 <b>{total_qty:,.0f}</b> 件，采购额 <b>¥{total_amt:,.2f}</b></div>')
+
+        if not sup_ov.empty:
+            sup_count = len(sup_ov)
+            summary_lines.append(f'<div class="summary-row"><span class="summary-icon">🏭</span> 涉及 <b>{sup_count:,}</b> 家供应商</div>')
+
+        # 2. 采购金额
+        if not ledger.empty:
+            amt_col = "SKU采购金额" if "SKU采购金额" in ledger.columns else "采购金额"
+            if amt_col in ledger.columns:
+                total_amt_ledger = ledger[amt_col].sum()
+                top_sku_amt = ledger.nlargest(1, amt_col)
+                top_sku_name = top_sku_amt["SKU"].iloc[0] if "SKU" in top_sku_amt.columns else ""
+                top_sku_val = top_sku_amt[amt_col].iloc[0]
+                summary_lines.append(f'<div class="summary-row"><span class="summary-icon">💰</span> 采购金额合计 <b>¥{total_amt_ledger:,.2f}</b>，最高金额SKU：<b>{top_sku_name}</b>（¥{top_sku_val:,.2f}）</div>')
+
+        # 3. 补货分析
+        if not rep.empty:
+            rep_count = len(rep)
+            rep_qty = rep['需采购量'].sum() if '需采购量' in rep.columns else 0
+            summary_lines.append(f'<div class="summary-row"><span class="summary-icon">🧮</span> 需补货 <b>{rep_count:,}</b> 个SKU，总补货量 <b>{rep_qty:,.0f}</b> 件</div>')
+
+        # 4. 履约数据
+        if not fr.empty:
+            total_fr = len(fr)
+            full_n = len(fr[fr["履约类别"] == FULFILLMENT_FULL])
+            part_n = len(fr[fr["履约类别"] == FULFILLMENT_PARTIAL])
+            none_n = len(fr[fr["履约类别"] == FULFILLMENT_NONE])
+            full_rate = full_n / total_fr * 100 if total_fr > 0 else 0
+            summary_lines.append(f'<div class="summary-row"><span class="summary-icon">📊</span> 履约率：<b>{full_rate:.1f}%</b> 足额满足，部分满足 {part_n} 单，未履约 {none_n} 单</div>')
+
+        if not dt.empty:
+            normal_n = len(dt[dt["履约时效状态"] == "正常履约"])
+            minor_n = len(dt[dt["履约时效状态"] == "轻微逾期"])
+            severe_n = len(dt[dt["履约时效状态"] == "严重逾期"])
+            total_dt = len(dt)
+            overdue_n = minor_n + severe_n
+            overdue_rate = overdue_n / total_dt * 100 if total_dt > 0 else 0
+
+            top_sup_names = ""
+            if "供应商名称" in dt.columns and overdue_n > 0:
+                overdue_orders = dt[dt["履约时效状态"].isin(["轻微逾期", "严重逾期"])]
+                top_overdue_sup = overdue_orders.groupby("供应商名称").agg(逾期数=("采购单号", "nunique")).reset_index()
+                top_overdue_sup = top_overdue_sup.sort_values("逾期数", ascending=False).head(3)
+                top_sup_names = "、".join(top_overdue_sup["供应商名称"].tolist()[:3])
+
+            summary_lines.append(f'<div class="summary-row summary-warn"><span class="summary-icon">⏱️</span> 履约时效：逾期率 <b>{overdue_rate:.1f}%</b>（轻微 {minor_n} / 严重 {severe_n}）</div>')
+            if overdue_n > 0 and top_sup_names:
+                summary_lines.append(f'<div class="summary-row summary-warn-detail">⚠️ 逾期集中供应商：{top_sup_names}</div>')
+
+        # 5. 预警数据
+        if not sku_alert.empty:
+            level1 = len(sku_alert[sku_alert["超阈值程度"] == "一级预警"])
+            level2 = len(sku_alert[sku_alert["超阈值程度"] == "二级预警"])
+            level3 = len(sku_alert[sku_alert["超阈值程度"] == "三级预警"])
+            total_alert = level1 + level2 + level3
+            summary_lines.append(f'<div class="summary-row summary-warn"><span class="summary-icon">🚨</span> 价格预警：<b>{total_alert}</b> 条异常（一级 {level1} / 二级 {level2} / 三级 {level3}）</div>')
+
+            if "SKU" in sku_alert.columns and total_alert > 0:
+                alert_skus = sku_alert[sku_alert["超阈值程度"].isin(["一级预警", "二级预警"])]
+                if not alert_skus.empty:
+                    top_alert = alert_skus.groupby("SKU").size().reset_index(name="预警次数")
+                    top_alert = top_alert.sort_values("预警次数", ascending=False).head(3)
+                    top_sku_names = "、".join(top_alert["SKU"].astype(str).tolist()[:3])
+                    summary_lines.append(f'<div class="summary-row summary-warn-detail">🔴 高价差异SKU：{top_sku_names}</div>')
+
+        summary_html = '<div class="info-sidebar">' + "\n".join(summary_lines) + '</div>'
+
+        # 逐行动画：用 JS 逐行淡入
+        animated_lines = []
+        for i, line in enumerate(summary_lines):
+            delay = i * 0.35
+            animated_lines.append(f'<div class="summary-line-anim" style="animation-delay:{delay}s">{line}</div>')
+        animated_html = '<div class="info-sidebar">' + "\n".join(animated_lines) + '</div>'
+
+        _info_placeholder.markdown(animated_html, unsafe_allow_html=True)
+
+    # ═══════════════════════════════════════════════════════════
+    # 第一行：SKU汇总 | 供应商总览
+    # ═══════════════════════════════════════════════════════════
+    row1_l, row1_r = st.columns(2)
+
+    with row1_l:
+        card("📦", "SKU 汇总")
+        if not agg.empty:
+            c1, c2, c3 = st.columns(3)
+            c1.metric("SKU总数(个)", f"{len(agg):,}")
+            c2.metric("总采购量(件)", f"{agg['采购数量'].sum():,.0f}" if "采购数量" in agg.columns else "-")
+            c3.metric("总采购额(元)", f"{agg['SKU采购金额'].sum():,.2f}" if "SKU采购金额" in agg.columns else "-")
+            st.dataframe(agg, use_container_width=True, hide_index=True, height=130)
+            download_excel(agg, "SKU汇总.xlsx")
+        else:
+            c1, c2, c3 = st.columns(3)
+            c1.metric("SKU总数(个)", "-")
+            c2.metric("总采购量(件)", "-")
+            c3.metric("总采购额(元)", "-")
+            st.info("请上传数据")
+        card_end()
+
+    with row1_r:
+        card("🏭", "供应商总览")
+        if not sup_ov.empty:
+            c1, c2, c3 = st.columns(3)
+            c1.metric("供应商总数(个)", f"{len(sup_ov):,}")
+            c2.metric("总采购额(元)", f"{sup_ov['累计采购金额'].sum():,.2f}" if "累计采购金额" in sup_ov.columns else "-")
+            c3.metric("SKU数(个)", f"{sup_ov['合作SKU数'].sum():,}" if "合作SKU数" in sup_ov.columns else "-")
+            st.dataframe(sup_ov, use_container_width=True, hide_index=True, height=130)
+            download_excel(sup_ov, "供应商总览.xlsx")
+        else:
+            c1, c2, c3 = st.columns(3)
+            c1.metric("供应商总数(个)", "-")
+            c2.metric("总采购额(元)", "-")
+            c3.metric("SKU数(个)", "-")
+            st.info("请上传数据")
+        card_end()
+
+    section_header("采购金额数据分析", "sec-amount")
+
+    # ═══════════════════════════════════════════════════════════
+    # SKU台账（全宽）
+    # ═══════════════════════════════════════════════════════════
+    card("📋", "SKU 台账")
+    if not ledger.empty:
+        st.dataframe(ledger, use_container_width=True, hide_index=True, height=130)
+        download_excel(ledger, "SKU台账.xlsx")
+    else:
+        st.info("请上传数据")
+    card_end()
+
+    # ═══════════════════════════════════════════════════════════
+    # 供应商维度 | 单品维度（两等分）
+    # ═══════════════════════════════════════════════════════════
+    row3_l, row3_r = st.columns(2)
+
+    with row3_l:
+        card("🔍", "供应商维度")
+        if not sup_ov.empty:
+            sel_sup = st.selectbox("供应商", sup_ov["供应商名称"].tolist(), key="sup_detail")
+            sup_detail = supplier_sku_detail(filtered, sel_sup)
+            if not sup_detail.empty:
+                st.dataframe(sup_detail, use_container_width=True, hide_index=True, height=130)
+                download_excel(sup_detail, f"{sel_sup}_SKU明细.xlsx")
+                pc1, pc2 = st.columns(2)
+                with pc1:
+                    if "采购金额" in sup_detail.columns:
+                        st.caption(f"{sel_sup} SKU金额占比")
+                        st.plotly_chart(pie_chart(sup_detail, "采购金额", "SKU"), use_container_width=True)
+                with pc2:
+                    if "采购数量" in sup_detail.columns:
+                        st.caption(f"{sel_sup} SKU采购量占比")
+                        st.plotly_chart(pie_chart(sup_detail, "采购数量", "SKU"), use_container_width=True)
+            else:
+                st.info("该供应商暂无SKU明细")
+        else:
+            st.info("请上传数据")
+        card_end()
+
+    with row3_r:
+        card("⚖️", "单品维度")
+        if "SKU" in filtered.columns and not filtered.empty:
+            sku_list = ledger["SKU"].tolist() if not ledger.empty and "SKU" in ledger.columns else sorted(filtered["SKU"].unique())
+            sel_sku = st.selectbox("SKU", sku_list, index=0, key="sup_cross")
+            comp = supplier_cross_comparison(filtered, sel_sku)
+            if not comp.empty:
+                st.dataframe(comp, use_container_width=True, hide_index=True, height=130)
+                download_excel(comp, f"{sel_sku}_供应商对比.xlsx")
+                cc1, cc2 = st.columns(2)
+                with cc1:
+                    if "采购金额" in comp.columns:
+                        st.caption(f"{sel_sku} 供应商金额占比")
+                        st.plotly_chart(pie_chart(comp, "采购金额", "供应商名称"), use_container_width=True)
+                with cc2:
+                    if "平均单价" in comp.columns:
+                        st.caption(f"{sel_sku} 供应商平均单价")
+                        st.plotly_chart(bar_chart(comp, "供应商名称", "平均单价"), use_container_width=True)
+        else:
+            st.info("请上传数据")
+        card_end()
+
+    section_header("补货数据分析", "sec-replenish")
+
+    card("🧮", "补货计算")
+    if has_data:
+        rc1, rc2, rc3 = st.columns(3)
+        with rc1: rep_cycle = st.number_input("周期(天)", 1, 90, 7, key="rep_cycle")
+        with rc2:
+            if "配送中心" in filtered.columns:
+                rep_addr = st.multiselect("配送中心", sorted(filtered["配送中心"].dropna().unique()), key="rep_addr")
+            elif "送货地址" in filtered.columns:
+                rep_addr = st.multiselect("发货地", sorted(filtered["送货地址"].dropna().unique()), key="rep_addr")
+            else:
+                rep_addr = None
+        with rc3:
+            if "SKU" in filtered.columns:
+                rep_sku = st.multiselect("SKU", sorted(filtered["SKU"].dropna().unique()), key="rep_sku")
+            else:
+                rep_sku = None
+
+        if "SKU" in filtered.columns:
+            all_skus = sorted(filtered["SKU"].dropna().unique())
+            if "safety_stock_df" not in st.session_state:
+                st.session_state["safety_stock_df"] = pd.DataFrame({"SKU": all_skus, "安全库存": [20] * len(all_skus)})
+            safety_df = st.session_state["safety_stock_df"]
+            new_skus = [s for s in all_skus if s not in safety_df["SKU"].values]
+            if new_skus:
+                safety_df = pd.concat([safety_df, pd.DataFrame({"SKU": new_skus, "安全库存": [20] * len(new_skus)})], ignore_index=True)
+                st.session_state["safety_stock_df"] = safety_df
+
+            sku_name_map = {}
+            sku_dc_map = {}
+            if "SKU名称" in filtered.columns:
+                sku_name_map = filtered.dropna(subset=["SKU名称"]).groupby("SKU")["SKU名称"].first().to_dict()
+            if "配送中心" in filtered.columns:
+                sku_dc_map = filtered.dropna(subset=["配送中心"]).groupby("SKU")["配送中心"].first().to_dict()
+            display_df = safety_df.copy()
+            display_df["SKU名称"] = display_df["SKU"].map(sku_name_map)
+            display_df["配送中心"] = display_df["SKU"].map(sku_dc_map)
+            col_order = [c for c in ["SKU", "SKU名称", "配送中心", "安全库存"] if c in display_df.columns]
+            display_df = display_df[col_order]
+
+            safety_map = dict(zip(safety_df["SKU"], safety_df["安全库存"]))
+
+            with st.expander("⚙️ 安全库存配置（按SKU）", expanded=False):
+                edited_safety = st.data_editor(
+                    display_df, use_container_width=True, hide_index=True,
+                    column_config={"安全库存": st.column_config.NumberColumn(min_value=0, step=1, default=20)},
+                    disabled=list(set(display_df.columns) - {"安全库存"}),
+                    key="safety_editor",
+                )
+                safety_df["安全库存"] = edited_safety["安全库存"].values
+                st.session_state["safety_stock_df"] = safety_df
+                safety_map = dict(zip(safety_df["SKU"], safety_df["安全库存"]))
+        else:
+            safety_map = {}
+
+        if rep.empty:
+            st.success("所有SKU库存充足，无需补货")
+        else:
+            rep_filtered = rep.copy()
+            addr_col = "配送中心" if "配送中心" in rep_filtered.columns else "送货地址"
+            if rep_addr and addr_col in rep_filtered.columns:
+                rep_filtered = rep_filtered[rep_filtered[addr_col].isin(rep_addr)]
+            if rep_sku and "SKU" in rep_filtered.columns:
+                rep_filtered = rep_filtered[rep_filtered["SKU"].isin(rep_sku)]
+            if rep_filtered.empty:
+                st.success("所选范围内无需补货")
+            else:
+                c1, c2 = st.columns(2)
+                c1.metric("需补货SKU数", f"{len(rep_filtered):,}")
+                c2.metric("总需补货量", f"{rep_filtered['需采购量'].sum():,.0f}")
+                st.dataframe(rep_filtered, use_container_width=True, hide_index=True, height=130)
+                dl1, dl2 = st.columns([1, 1])
+                with dl1:
+                    download_excel(rep_filtered, "补货计算.xlsx")
+                with dl2:
+                    if st.button("采购需求提报"):
+                        st.session_state["_trigger_req_modal"] = True
+                        st.rerun()
+    else:
+        st.info("请上传数据")
+    card_end()
+
+    if has_data and st.session_state.pop("_trigger_req_modal", False) and not rep.empty:
+        addr_col = "配送中心" if "配送中心" in rep.columns else "送货地址"
+        modal_data = rep.copy()
+        if rep_addr and addr_col in modal_data.columns:
+            modal_data = modal_data[modal_data[addr_col].isin(rep_addr)]
+        if rep_sku and "SKU" in modal_data.columns:
+            modal_data = modal_data[modal_data["SKU"].isin(rep_sku)]
+        req_modal(modal_data)
+
+    section_header("采购履约数据分析", "sec-fulfillment")
+
+    # ═══════════════════════════════════════════════════════════
+    # 履约率（全宽）
+    # ═══════════════════════════════════════════════════════════
+    card("✅", "履约率")
+    if not fr.empty:
+        fr_display = fr.copy()
+        c1, c2, c3, c4 = st.columns(4)
+        total = len(fr_display)
+        full_n = len(fr_display[fr_display["履约类别"] == FULFILLMENT_FULL])
+        part_n = len(fr_display[fr_display["履约类别"] == FULFILLMENT_PARTIAL])
+        none_n = len(fr_display[fr_display["履约类别"] == FULFILLMENT_NONE])
+        c1.metric("总采购单量", f"{total:,}")
+        c2.metric("足额满足", f"{full_n:,} ({full_n/total*100:.1f}%)" if total > 0 else "-")
+        c3.metric("部分满足", f"{part_n:,} ({part_n/total*100:.1f}%)" if total > 0 else "-")
+        c4.metric("未履约", f"{none_n:,} ({none_n/total*100:.1f}%)" if total > 0 else "-")
+
+        fc_a, fc_b, fc_c = st.columns(3)
+        with fc_a:
+            fr_dim = st.selectbox("筛选维度", ["SKU", "供应商", "库房"], key="fr_dim")
+        dim_col_map = {"SKU": "SKU", "供应商": "供应商名称", "库房": "库房"}
+        fr_dim_col = dim_col_map.get(fr_dim, "SKU")
+        with fc_b:
+            if fr_dim_col in fr.columns:
+                fr_dim_val = st.multiselect(f"选择{fr_dim}", sorted(fr[fr_dim_col].dropna().unique()), key="fr_dim_val")
+            else:
+                fr_dim_val = []
+        with fc_c:
+            fr_cat = st.selectbox("履约类别", ["全部", "足额满足", "部分满足", "未履约"], key="fr_cat")
+
+        if fr_dim_val and fr_dim_col in fr_display.columns:
+            fr_display = fr_display[fr_display[fr_dim_col].isin(fr_dim_val)]
+        cat_map = {"足额满足": FULFILLMENT_FULL, "部分满足": FULFILLMENT_PARTIAL, "未履约": FULFILLMENT_NONE}
+        if fr_cat != "全部" and fr_cat in cat_map:
+            fr_display = fr_display[fr_display["履约类别"] == cat_map[fr_cat]]
+        cols = [c for c in ["采购单号", "SKU", "SKU名称", "供应商名称", "库房",
+                            "原始采购数量", "实收数量", "到货完成率", "短缺数量", "短缺金额",
+                            "履约类别"] if c in fr_display.columns]
+        st.dataframe(fr_display[cols] if cols else fr_display, use_container_width=True, hide_index=True, height=130)
+        download_excel(fr_display, "履约率.xlsx")
+
+        pc1, pc2, pc3 = st.columns(3)
+        with pc1:
+            if "SKU" in fr.columns:
+                sku_cat = fr.groupby("履约类别")["SKU"].nunique().reset_index()
+                sku_cat.columns = ["履约类别", "SKU数"]
+                st.caption("按SKU维度履约分布")
+                st.plotly_chart(pie_chart(sku_cat, "SKU数", "履约类别"), use_container_width=True)
+        with pc2:
+            if "供应商名称" in fr.columns:
+                sup_cat = fr.groupby("履约类别")["供应商名称"].nunique().reset_index()
+                sup_cat.columns = ["履约类别", "供应商数"]
+                st.caption("按供应商维度履约分布")
+                st.plotly_chart(pie_chart(sup_cat, "供应商数", "履约类别"), use_container_width=True)
+        with pc3:
+            if "库房" in fr.columns:
+                wh_cat = fr.groupby("履约类别")["库房"].nunique().reset_index()
+                wh_cat.columns = ["履约类别", "库房数"]
+                st.caption("按库房维度履约分布")
+                st.plotly_chart(pie_chart(wh_cat, "库房数", "履约类别"), use_container_width=True)
+    else:
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("总采购单量", "-")
+        c2.metric("足额满足", "-")
+        c3.metric("部分满足", "-")
+        c4.metric("未履约", "-")
+        st.info("请上传数据")
+    card_end()
+
+    # ═══════════════════════════════════════════════════════════
+    # 履约时效（全宽）
+    # ═══════════════════════════════════════════════════════════
+    card("⏱️", "履约时效")
+    if "dt_cycle" not in st.session_state:
+        st.session_state["dt_cycle"] = DEFAULT_DELIVERY_CYCLE_DAYS
+    dt_cycle = st.number_input("周期(天)", 1, 60, DEFAULT_DELIVERY_CYCLE_DAYS, key="dt_cycle")
+    if has_data:
+        dt_result = delivery_timeliness(filtered, dt_cycle)
+    else:
+        dt_result = pd.DataFrame()
+    if dt_result.empty:
+        if has_data:
+            st.info("无采购时间数据")
+        else:
+            c1, c2, c3 = st.columns(3)
+            c1.metric("正常履约", "-")
+            c2.metric("轻微逾期", "-")
+            c3.metric("严重逾期", "-")
+            st.info("请上传数据")
+    else:
+        normal_n = len(dt_result[dt_result["履约时效状态"] == "正常履约"])
+        minor_n = len(dt_result[dt_result["履约时效状态"] == "轻微逾期"])
+        severe_n = len(dt_result[dt_result["履约时效状态"] == "严重逾期"])
+        total = len(dt_result)
+        c1, c2, c3 = st.columns(3)
+        c1.metric("正常履约", f"{normal_n:,} ({normal_n/total*100:.1f}%)" if total > 0 else "-")
+        c2.metric("轻微逾期", f"{minor_n:,} ({minor_n/total*100:.1f}%)" if total > 0 else "-")
+        c3.metric("严重逾期", f"{severe_n:,} ({severe_n/total*100:.1f}%)" if total > 0 else "-")
+        cols = [c for c in ["采购单号", "供应商名称", "采购单状态", "采购时间", "预计到货时间",
+                            "履约时效天数", "履约时效状态"] if c in dt_result.columns]
+        st.dataframe(dt_result[cols] if cols else dt_result, use_container_width=True, hide_index=True, height=130)
+        download_excel(dt_result, "履约时效.xlsx")
+
+        # 逾期 Top10 柱状图（供应商 & SKU）
+        overdue_orders = dt_result[dt_result["履约时效状态"].isin(["轻微逾期", "严重逾期"])]
+        if not overdue_orders.empty:
+            bc1, bc2 = st.columns(2)
+            with bc1:
+                if "供应商名称" in overdue_orders.columns:
+                    sup_overdue = overdue_orders.groupby("供应商名称").agg(逾期数=("采购单号", "nunique")).reset_index()
+                    sup_overdue = sup_overdue.sort_values("逾期数", ascending=False).head(10)
+                    if not sup_overdue.empty:
+                        st.caption("供应商逾期 Top10")
+                        fig_sup = px.bar(sup_overdue, x="供应商名称", y="逾期数", color_discrete_sequence=["#ef4444"])
+                        fig_sup.update_traces(texttemplate="%{y}", textposition="outside")
+                        fig_sup.update_layout(margin=dict(l=10, r=10, t=25, b=10), height=220, showlegend=False, plot_bgcolor="#fff", paper_bgcolor="#fff")
+                        st.plotly_chart(fig_sup, use_container_width=True)
+            with bc2:
+                sku_data = filtered[["采购单号", "SKU", "SKU名称"]].drop_duplicates(subset=["采购单号"]) if "SKU" in filtered.columns else pd.DataFrame()
+                if not sku_data.empty:
+                    overdue_with_sku = overdue_orders.merge(sku_data, on="采购单号", how="left")
+                    if "SKU名称" in overdue_with_sku.columns:
+                        sku_label_col = "SKU名称"
+                    elif "SKU" in overdue_with_sku.columns:
+                        sku_label_col = "SKU"
+                    else:
+                        sku_label_col = None
+                    if sku_label_col:
+                        sku_overdue = overdue_with_sku.groupby(sku_label_col).agg(逾期数=("采购单号", "nunique")).reset_index()
+                        sku_overdue = sku_overdue.sort_values("逾期数", ascending=False).head(10)
+                        if not sku_overdue.empty:
+                            sku_overdue["名称_短"] = sku_overdue[sku_label_col].astype(str).str[:6] + "…"
+                            sku_overdue["名称_全"] = sku_overdue[sku_label_col].astype(str)
+                            st.caption("SKU逾期 Top10")
+                            fig_sku = px.bar(sku_overdue, x="名称_短", y="逾期数", color_discrete_sequence=["#f97316"])
+                            fig_sku.update_traces(
+                                texttemplate="%{y}", textposition="outside",
+                                hovertemplate="%{customdata[0]}<br>逾期数：%{y}<extra></extra>",
+                                customdata=sku_overdue[["名称_全"]],
+                            )
+                            fig_sku.update_layout(margin=dict(l=10, r=10, t=25, b=10), height=220, showlegend=False, plot_bgcolor="#fff", paper_bgcolor="#fff")
+                            st.plotly_chart(fig_sku, use_container_width=True)
+    card_end()
+
+    section_header("采购预警数据分析", "sec-alert")
+
+    # ═══════════════════════════════════════════════════════════
+    # 价格预警（全宽）
+    # ═══════════════════════════════════════════════════════════
+    card("⚠️", "价格预警")
+    if has_data:
+        sku_alert_result = sku_price_alert_list(filtered, 5.0)
+    else:
+        sku_alert_result = pd.DataFrame()
+    if not sku_alert_result.empty:
+        if "SKU" in sku_alert_result.columns:
+            alert_sku = []
+            ac1, ac2, ac3 = st.columns(3)
+            with ac1:
+                alert_sku = st.multiselect("SKU", sorted(sku_alert_result["SKU"].dropna().unique()), key="alert_sku")
+            with ac2:
+                alert_sup = st.multiselect("供应商", sorted(sku_alert_result["供应商名称"].dropna().unique()), key="alert_sup") if "供应商名称" in sku_alert_result.columns else []
+            with ac3:
+                alert_level = st.multiselect("超阈值程度", ["一级预警", "二级预警", "三级预警", "未超阈值"], key="alert_level")
+            if alert_sku:
+                sku_alert_result = sku_alert_result[sku_alert_result["SKU"].isin(alert_sku)]
+            if alert_sup:
+                sku_alert_result = sku_alert_result[sku_alert_result["供应商名称"].isin(alert_sup)]
+            if alert_level:
+                sku_alert_result = sku_alert_result[sku_alert_result["超阈值程度"].isin(alert_level)]
+        else:
+            alert_sku = []
+        c1, c2, c3 = st.columns(3)
+        level1_n = len(sku_alert_result[sku_alert_result["超阈值程度"] == "一级预警"])
+        level2_n = len(sku_alert_result[sku_alert_result["超阈值程度"] == "二级预警"])
+        level3_n = len(sku_alert_result[sku_alert_result["超阈值程度"] == "三级预警"])
+        c1.metric("🔴 一级预警(≥15%)", f"{level1_n:,}")
+        c2.metric("🟠 二级预警(8%-15%)", f"{level2_n:,}")
+        c3.metric("🟡 三级预警(5%-8%)", f"{level3_n:,}")
+
+        # SKU最低价列仅在有SKU筛选时展示
+        show_cols = [c for c in sku_alert_result.columns if c != "SKU最低价"] if not alert_sku else list(sku_alert_result.columns)
+        st.dataframe(sku_alert_result[show_cols], use_container_width=True, hide_index=True, height=200)
+        download_excel(sku_alert_result, "价格预警.xlsx")
     else:
         c1, c2, c3 = st.columns(3)
-        c1.metric("正常履约", "-")
-        c2.metric("轻微逾期", "-")
-        c3.metric("严重逾期", "-")
+        c1.metric("🔴 一级预警(≥15%)", "-")
+        c2.metric("🟠 二级预警(8%-15%)", "-")
+        c3.metric("🟡 三级预警(5%-8%)", "-")
         st.info("请上传数据")
-else:
-    normal_n = len(dt_result[dt_result["履约时效状态"] == "正常履约"])
-    minor_n = len(dt_result[dt_result["履约时效状态"] == "轻微逾期"])
-    severe_n = len(dt_result[dt_result["履约时效状态"] == "严重逾期"])
-    total = len(dt_result)
-    c1, c2, c3 = st.columns(3)
-    c1.metric("正常履约", f"{normal_n:,} ({normal_n/total*100:.1f}%)" if total > 0 else "-")
-    c2.metric("轻微逾期", f"{minor_n:,} ({minor_n/total*100:.1f}%)" if total > 0 else "-")
-    c3.metric("严重逾期", f"{severe_n:,} ({severe_n/total*100:.1f}%)" if total > 0 else "-")
-    cols = [c for c in ["采购单号", "供应商名称", "采购单状态", "采购时间", "预计到货时间",
-                        "履约时效天数", "履约时效状态"] if c in dt_result.columns]
-    st.dataframe(dt_result[cols] if cols else dt_result, use_container_width=True, hide_index=True, height=130)
-    download_excel(dt_result, "履约时效.xlsx")
-
-    # 逾期 Top10 柱状图（供应商 & SKU）
-    overdue_orders = dt_result[dt_result["履约时效状态"].isin(["轻微逾期", "严重逾期"])]
-    if not overdue_orders.empty:
-        bc1, bc2 = st.columns(2)
-        with bc1:
-            if "供应商名称" in overdue_orders.columns:
-                sup_overdue = overdue_orders.groupby("供应商名称").agg(逾期数=("采购单号", "nunique")).reset_index()
-                sup_overdue = sup_overdue.sort_values("逾期数", ascending=False).head(10)
-                if not sup_overdue.empty:
-                    st.caption("供应商逾期 Top10")
-                    fig_sup = px.bar(sup_overdue, x="供应商名称", y="逾期数", color_discrete_sequence=["#ef4444"])
-                    fig_sup.update_traces(texttemplate="%{y}", textposition="outside")
-                    fig_sup.update_layout(margin=dict(l=10, r=10, t=25, b=10), height=220, showlegend=False, plot_bgcolor="#fff", paper_bgcolor="#fff")
-                    st.plotly_chart(fig_sup, use_container_width=True)
-        with bc2:
-            sku_data = filtered[["采购单号", "SKU", "SKU名称"]].drop_duplicates(subset=["采购单号"]) if "SKU" in filtered.columns else pd.DataFrame()
-            if not sku_data.empty:
-                overdue_with_sku = overdue_orders.merge(sku_data, on="采购单号", how="left")
-                if "SKU名称" in overdue_with_sku.columns:
-                    sku_label_col = "SKU名称"
-                elif "SKU" in overdue_with_sku.columns:
-                    sku_label_col = "SKU"
-                else:
-                    sku_label_col = None
-                if sku_label_col:
-                    sku_overdue = overdue_with_sku.groupby(sku_label_col).agg(逾期数=("采购单号", "nunique")).reset_index()
-                    sku_overdue = sku_overdue.sort_values("逾期数", ascending=False).head(10)
-                    if not sku_overdue.empty:
-                        sku_overdue["名称_短"] = sku_overdue[sku_label_col].astype(str).str[:6] + "…"
-                        sku_overdue["名称_全"] = sku_overdue[sku_label_col].astype(str)
-                        st.caption("SKU逾期 Top10")
-                        fig_sku = px.bar(sku_overdue, x="名称_短", y="逾期数", color_discrete_sequence=["#f97316"])
-                        fig_sku.update_traces(
-                            texttemplate="%{y}", textposition="outside",
-                            hovertemplate="%{customdata[0]}<br>逾期数：%{y}<extra></extra>",
-                            customdata=sku_overdue[["名称_全"]],
-                        )
-                        fig_sku.update_layout(margin=dict(l=10, r=10, t=25, b=10), height=220, showlegend=False, plot_bgcolor="#fff", paper_bgcolor="#fff")
-                        st.plotly_chart(fig_sku, use_container_width=True)
-card_end()
-
-section_header("采购预警数据分析", "sec-alert")
-
-# ═══════════════════════════════════════════════════════════
-# 价格预警（全宽）
-# ═══════════════════════════════════════════════════════════
-card("⚠️", "价格预警")
-if has_data:
-    sku_alert_result = sku_price_alert_list(filtered, 5.0)
-else:
-    sku_alert_result = pd.DataFrame()
-if not sku_alert_result.empty:
-    if "SKU" in sku_alert_result.columns:
-        alert_sku = []
-        ac1, ac2, ac3 = st.columns(3)
-        with ac1:
-            alert_sku = st.multiselect("SKU", sorted(sku_alert_result["SKU"].dropna().unique()), key="alert_sku")
-        with ac2:
-            alert_sup = st.multiselect("供应商", sorted(sku_alert_result["供应商名称"].dropna().unique()), key="alert_sup") if "供应商名称" in sku_alert_result.columns else []
-        with ac3:
-            alert_level = st.multiselect("超阈值程度", ["一级预警", "二级预警", "三级预警", "未超阈值"], key="alert_level")
-        if alert_sku:
-            sku_alert_result = sku_alert_result[sku_alert_result["SKU"].isin(alert_sku)]
-        if alert_sup:
-            sku_alert_result = sku_alert_result[sku_alert_result["供应商名称"].isin(alert_sup)]
-        if alert_level:
-            sku_alert_result = sku_alert_result[sku_alert_result["超阈值程度"].isin(alert_level)]
-    else:
-        alert_sku = []
-    c1, c2, c3 = st.columns(3)
-    level1_n = len(sku_alert_result[sku_alert_result["超阈值程度"] == "一级预警"])
-    level2_n = len(sku_alert_result[sku_alert_result["超阈值程度"] == "二级预警"])
-    level3_n = len(sku_alert_result[sku_alert_result["超阈值程度"] == "三级预警"])
-    c1.metric("🔴 一级预警(≥15%)", f"{level1_n:,}")
-    c2.metric("🟠 二级预警(8%-15%)", f"{level2_n:,}")
-    c3.metric("🟡 三级预警(5%-8%)", f"{level3_n:,}")
-
-    # SKU最低价列仅在有SKU筛选时展示
-    show_cols = [c for c in sku_alert_result.columns if c != "SKU最低价"] if not alert_sku else list(sku_alert_result.columns)
-    st.dataframe(sku_alert_result[show_cols], use_container_width=True, hide_index=True, height=200)
-    download_excel(sku_alert_result, "价格预警.xlsx")
-else:
-    c1, c2, c3 = st.columns(3)
-    c1.metric("🔴 一级预警(≥15%)", "-")
-    c2.metric("🟠 二级预警(8%-15%)", "-")
-    c3.metric("🟡 三级预警(5%-8%)", "-")
-    st.info("请上传数据")
-card_end()
+    card_end()
