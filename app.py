@@ -888,7 +888,7 @@ with _main_col:
                         sku_overdue = overdue_with_sku.groupby(sku_label_col).agg(逾期数=("采购单号", "nunique")).reset_index()
                         sku_overdue = sku_overdue.sort_values("逾期数", ascending=False).head(10)
                         if not sku_overdue.empty:
-                            sku_overdue["名称_短"] = sku_overdue[sku_label_col].astype(str).str[:6] + "…"
+                            sku_overdue["名称_短"] = sku_overdue[sku_label_col].astype(str).str[:3] + "…"
                             sku_overdue["名称_全"] = sku_overdue[sku_label_col].astype(str)
                             st.caption("SKU逾期 Top10")
                             fig_sku = px.bar(sku_overdue, x="名称_短", y="逾期数", color_discrete_sequence=["#f97316"])
