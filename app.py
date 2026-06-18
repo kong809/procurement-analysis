@@ -293,10 +293,9 @@ section[data-testid="stSidebar"] button[kind="secondary"]:hover {
 </style>""", unsafe_allow_html=True)
 
 # ── 标题行 + 右侧反馈按钮 ──
-_hdr_l, _hdr_r = st.columns([8, 1.5])
-with _hdr_l:
-    st.markdown("## 👋 您好,我是你的采购单智能数据分析助手!")
-with _hdr_r:
+st.markdown("## 👋 您好,我是你的采购单智能数据分析助手!")
+_fb_col1, _fb_col2 = st.columns([9, 2])
+with _fb_col2:
     if st.button("💬 反馈建议", key="_feedback_btn"):
         st.session_state["_show_feedback"] = True
         st.rerun()
