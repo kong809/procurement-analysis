@@ -27,13 +27,14 @@ def card_end():
 
 
 def section_header(title, anchor_id="", tooltip=""):
-    tooltip_html = ""
     if tooltip:
-        tooltip_html = f'<span title="{tooltip}" style="cursor:help;font-size:0.85rem;">❓</span>'
-    if anchor_id:
-        st.markdown(f'<a name="{anchor_id}"></a><div class="section-header" id="{anchor_id}">{title}{tooltip_html}</div>', unsafe_allow_html=True)
+        tip_html = f'<span class="section-help" data-tip="{tooltip}"></span>'
     else:
-        st.markdown(f'<div class="section-header">{title}{tooltip_html}</div>', unsafe_allow_html=True)
+        tip_html = ""
+    if anchor_id:
+        st.markdown(f'<a name="{anchor_id}"></a><div class="section-header" id="{anchor_id}">{title}{tip_html}</div>', unsafe_allow_html=True)
+    else:
+        st.markdown(f'<div class="section-header">{title}{tip_html}</div>', unsafe_allow_html=True)
 
 
 @st.dialog("采购需求提报", width="large")
@@ -121,18 +122,24 @@ h3 { font-size: 0.95rem !important; font-weight: 600 !important; color: #374151 
     padding: 4px 0; margin: 2px 0 0 0;
     border-left: 4px solid #3b82f6; padding-left: 10px;
     scroll-margin-top: 60px; display: flex; align-items: center; gap: 6px;
+    position: relative;
 }
-.section-tooltip {
-    cursor: help; font-size: 0.8rem; position: relative;
+.section-help {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #e0e7ff; color: #3b82f6; font-size: 11px;
+    font-weight: 700; cursor: help; flex-shrink: 0; position: relative;
 }
-.section-tooltip .section-tooltip-text {
-    display: none; position: absolute; left: 0; top: 100%;
+.section-help::before { content: "?"; }
+.section-help:hover::after {
+    content: attr(data-tip);
+    position: absolute; left: -10px; top: 100%;
     background: #1e293b; color: #f1f5f9; font-size: 12px; font-weight: 400;
     padding: 8px 12px; border-radius: 6px; white-space: normal;
-    z-index: 200; margin-top: 4px; line-height: 1.5; max-width: 300px;
+    z-index: 9999; margin-top: 4px; line-height: 1.5; max-width: 300px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    text-align: left; width: max-content;
 }
-.section-tooltip:hover .section-tooltip-text { display: block; }
 a[name] { scroll-margin-top: 60px; display: block; }
 
 /* ─ Metric 卡片 ─ */
