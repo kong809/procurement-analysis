@@ -292,6 +292,8 @@ section[data-testid="stSidebar"] button[kind="secondary"]:hover {
 }
 </style>""", unsafe_allow_html=True)
 
+st.markdown("<br>", unsafe_allow_html=True)
+
 # ── 标题行 + 右侧反馈按钮 ──
 _hdr_l, _hdr_r = st.columns([7, 3])
 with _hdr_l:
