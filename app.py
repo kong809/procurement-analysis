@@ -26,11 +26,14 @@ def card_end():
     st.markdown('</div>', unsafe_allow_html=True)
 
 
-def section_header(title, anchor_id=""):
+def section_header(title, anchor_id="", tooltip=""):
+    tooltip_html = ""
+    if tooltip:
+        tooltip_html = f'<span title="{tooltip}" style="cursor:help;font-size:0.85rem;">❓</span>'
     if anchor_id:
-        st.markdown(f'<a name="{anchor_id}"></a><div class="section-header" id="{anchor_id}">{title}</div>', unsafe_allow_html=True)
+        st.markdown(f'<a name="{anchor_id}"></a><div class="section-header" id="{anchor_id}">{title}{tooltip_html}</div>', unsafe_allow_html=True)
     else:
-        st.markdown(f'<div class="section-header">{title}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="section-header">{title}{tooltip_html}</div>', unsafe_allow_html=True)
 
 
 @st.dialog("采购需求提报", width="large")
@@ -125,8 +128,8 @@ h3 { font-size: 0.95rem !important; font-weight: 600 !important; color: #374151 
 .section-tooltip .section-tooltip-text {
     display: none; position: absolute; left: 0; top: 100%;
     background: #1e293b; color: #f1f5f9; font-size: 12px; font-weight: 400;
-    padding: 8px 12px; border-radius: 6px; white-space: nowrap;
-    z-index: 200; margin-top: 4px; line-height: 1.5;
+    padding: 8px 12px; border-radius: 6px; white-space: normal;
+    z-index: 200; margin-top: 4px; line-height: 1.5; max-width: 300px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 .section-tooltip:hover .section-tooltip-text { display: block; }
@@ -428,7 +431,7 @@ with _main_col:
         df = pd.DataFrame()
         st.caption("当前数据：未上传")
 
-    section_header("基础数据分析", "sec-basic")
+    section_header("基础数据分析", "sec-basic", "按SKU、供应商双维度，对指定周期内采购数量、实收数量、采购金额、采购单价等指标开展统计分析。")
 
     # ═══════════════════════════════════════════════════════════
     # 筛选条件（紧凑一行）
@@ -608,7 +611,7 @@ with _main_col:
             st.info("请上传数据")
         card_end()
 
-    section_header("采购金额数据分析", "sec-amount")
+    section_header("采购金额数据分析", "sec-amount", "SKU、供应商维度精细化分析视图；可查看单供应商下各SKU采购金额分布，针对一品多商业务场景，支持查看同一SKU在不同供应商侧的供货分布、采购单价及采购金额占比。")
 
     # ═══════════════════════════════════════════════════════════
     # SKU台账（全宽）
@@ -671,7 +674,7 @@ with _main_col:
             st.info("请上传数据")
         card_end()
 
-    section_header("补货数据分析", "sec-replenish")
+    section_header("补货数据分析", "sec-replenish", "面向手动补货需求用户，简单计算补货所需量，并进行快捷补货操作，快速生成对应采购单。")
 
     card("🧮", "补货计算")
     if has_data:
@@ -763,7 +766,7 @@ with _main_col:
             modal_data = modal_data[modal_data["SKU"].isin(rep_sku)]
         req_modal(modal_data)
 
-    section_header("采购履约数据分析", "sec-fulfillment")
+    section_header("采购履约数据分析", "sec-fulfillment", "从采购单履约率、履约时效两大维度进行数据查看；支持查看SKU维度、供应商维度、库房维度的履约占比。")
 
     # ═══════════════════════════════════════════════════════════
     # 履约率（全宽）
@@ -912,7 +915,7 @@ with _main_col:
                             st.plotly_chart(fig_sku, use_container_width=True)
     card_end()
 
-    st.markdown(f'<a name="sec-alert"></a><div class="section-header" id="sec-alert">采购预警数据分析<span class="section-tooltip">❓<span class="section-tooltip-text">同 SKU 采购价高出最低价 8%-15% 触发二级预警；高出最低价 15% 及以上触发一级预警。</span></span></div>', unsafe_allow_html=True)
+    section_header("采购预警数据分析", "sec-alert", "同SKU采购价高出最低价8%-15%触发二级预警；高出最低价15%及以上触发一级预警。")
 
     # ═══════════════════════════════════════════════════════════
     # 价格预警（全宽）
