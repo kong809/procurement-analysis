@@ -295,15 +295,13 @@ section[data-testid="stSidebar"] button[kind="secondary"]:hover {
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ── 标题行 + 右侧反馈按钮 ──
-_hdr_l, _hdr_r = st.columns([7, 3])
+_hdr_l, _hdr_r = st.columns([8, 1.2])
 with _hdr_l:
     st.markdown("## 👋 您好,我是你的采购单智能数据分析助手!")
 with _hdr_r:
-    st.markdown("<div style='display:flex;justify-content:flex-end;'>", unsafe_allow_html=True)
     if st.button("💬 反馈建议", key="_feedback_btn"):
         st.session_state["_show_feedback"] = True
         st.rerun()
-    st.markdown("</div>", unsafe_allow_html=True)
 
 # ── 反馈弹窗 ──
 @st.dialog("反馈建议", width="large")
