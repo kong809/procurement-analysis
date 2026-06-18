@@ -117,8 +117,19 @@ h3 { font-size: 0.95rem !important; font-weight: 600 !important; color: #374151 
     font-size: 1.05rem; font-weight: 700; color: #1e40af;
     padding: 4px 0; margin: 2px 0 0 0;
     border-left: 4px solid #3b82f6; padding-left: 10px;
-    scroll-margin-top: 60px;
+    scroll-margin-top: 60px; display: flex; align-items: center; gap: 6px;
 }
+.section-tooltip {
+    cursor: help; font-size: 0.8rem; position: relative;
+}
+.section-tooltip .section-tooltip-text {
+    display: none; position: absolute; left: 0; top: 100%;
+    background: #1e293b; color: #f1f5f9; font-size: 12px; font-weight: 400;
+    padding: 8px 12px; border-radius: 6px; white-space: nowrap;
+    z-index: 200; margin-top: 4px; line-height: 1.5;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.section-tooltip:hover .section-tooltip-text { display: block; }
 a[name] { scroll-margin-top: 60px; display: block; }
 
 /* ─ Metric 卡片 ─ */
@@ -901,7 +912,7 @@ with _main_col:
                             st.plotly_chart(fig_sku, use_container_width=True)
     card_end()
 
-    section_header("采购预警数据分析", "sec-alert")
+    st.markdown(f'<a name="sec-alert"></a><div class="section-header" id="sec-alert">采购预警数据分析<span class="section-tooltip">❓<span class="section-tooltip-text">同 SKU 采购价高出最低价 8%-15% 触发二级预警；高出最低价 15% 及以上触发一级预警。</span></span></div>', unsafe_allow_html=True)
 
     # ═══════════════════════════════════════════════════════════
     # 价格预警（全宽）
