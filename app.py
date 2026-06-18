@@ -293,22 +293,20 @@ section[data-testid="stSidebar"] button[kind="secondary"]:hover {
 </style>""", unsafe_allow_html=True)
 
 # ── 标题行 + 右侧反馈按钮 ──
-_hdr_l, _hdr_r = st.columns([10, 1])
+_hdr_l, _hdr_r = st.columns([8, 1.5])
 with _hdr_l:
     st.markdown("## 👋 您好,我是你的采购单智能数据分析助手!")
 with _hdr_r:
-    if st.button("💬 反馈", key="_feedback_btn"):
+    if st.button("💬 反馈建议", key="_feedback_btn"):
         st.session_state["_show_feedback"] = True
         st.rerun()
 
 # ── 反馈弹窗 ──
-@st.dialog("用户反馈", width="large")
+@st.dialog("反馈建议", width="large")
 def feedback_dialog():
     st.markdown("**1. 请对该分析能力进行评分 * **")
-    rating = st.slider("星级评分", 1, 5, 5, key="fb_rating",
-                       help="1星最差，5星最好")
-    stars = "⭐" * rating
-    st.markdown(f"<div style='font-size:1.4rem;text-align:center;margin:-8px 0 8px'>{stars}</div>", unsafe_allow_html=True)
+    rating = st.selectbox("评分", ["⭐⭐⭐⭐⭐ 5星", "⭐⭐⭐⭐ 4星", "⭐⭐⭐ 3星", "⭐⭐ 2星", "⭐ 1星"],
+                          index=0, key="fb_rating", label_visibility="collapsed")
 
     st.markdown("---")
     st.markdown("**2. 您对现有的数据分析有哪些意见？**")
