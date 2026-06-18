@@ -273,6 +273,15 @@ section[data-testid="stSidebar"] button[kind="secondary"]:hover {
 }
 .summary-icon { margin-right: 4px; }
 
+/* ─ 反馈按钮 ─ */
+.feedback-btn {
+    position: fixed; top: 12px; right: 20px; z-index: 9999;
+    background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 20px;
+    padding: 6px 16px; cursor: pointer; font-size: 12px; color: #1e40af;
+    font-weight: 600; transition: all 0.15s; display: inline-flex; align-items: center; gap: 4px;
+}
+.feedback-btn:hover { background: #dbeafe; border-color: #93c5fd; }
+
 .summary-line-anim {
     opacity: 0;
     animation: summaryFadeIn 0.5s ease-out forwards;
@@ -283,7 +292,51 @@ section[data-testid="stSidebar"] button[kind="secondary"]:hover {
 }
 </style>""", unsafe_allow_html=True)
 
-st.markdown("## 👋 您好,我是你的采购单智能数据分析助手!")
+# ── 标题行 + 右侧反馈按钮 ──
+_hdr_l, _hdr_r = st.columns([10, 1])
+with _hdr_l:
+    st.markdown("## 👋 您好,我是你的采购单智能数据分析助手!")
+with _hdr_r:
+    if st.button("💬 反馈", key="_feedback_btn"):
+        st.session_state["_show_feedback"] = True
+        st.rerun()
+
+# ── 反馈弹窗 ──
+@st.dialog("用户反馈", width="large")
+def feedback_dialog():
+    st.markdown("**1. 请对该分析能力进行评分 * **")
+    rating = st.slider("星级评分", 1, 5, 5, key="fb_rating",
+                       help="1星最差，5星最好")
+    stars = "⭐" * rating
+    st.markdown(f"<div style='font-size:1.4rem;text-align:center;margin:-8px 0 8px'>{stars}</div>", unsafe_allow_html=True)
+
+    st.markdown("---")
+    st.markdown("**2. 您对现有的数据分析有哪些意见？**")
+    fb_opinion = st.text_area("请详细描述", key="fb_opinion", placeholder="请输入您的意见（非必填）", label_visibility="collapsed")
+
+    st.markdown("---")
+    st.markdown("**3. 您有哪些采购单数据分析需求没有满足？**")
+    fb_unmet = st.text_area("请详细描述", key="fb_unmet", placeholder="请输入未满足的需求（非必填）", label_visibility="collapsed")
+
+    st.markdown("---")
+    bc1, bc2, bc3 = st.columns([1, 1, 10])
+    with bc1:
+        if st.button("提交", type="primary", key="fb_submit"):
+            st.session_state["_fb_result"] = {
+                "评分": rating,
+                "意见": fb_opinion or "（未填写）",
+                "未满足需求": fb_unmet or "（未填写）",
+            }
+            st.session_state.pop("_show_feedback", None)
+            st.success("感谢您的反馈！")
+            st.rerun()
+    with bc2:
+        if st.button("取消", key="fb_cancel"):
+            st.session_state.pop("_show_feedback", None)
+            st.rerun()
+
+if st.session_state.pop("_show_feedback", False):
+    feedback_dialog()
 
 # ── 侧边栏导航 ──
 with st.sidebar:
